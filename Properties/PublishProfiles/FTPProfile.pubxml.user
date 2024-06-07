@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAMhvWPb0cIEGtZhCDWbo90QAAAAACAAAAAAAQZgAAAAEAACAAAABUMmGoGpcy0gsyN6auctw35ozwozXhmSfDWfYj4z1f4wAAAAAOgAAAAAIAACAAAACPd8LeeOWFWk2K6V8ySoFEBnjb3T9rJzLmqfqHqLYUXSAAAAD8Js8WP2XpEStVRWf94fS/fTCL+Nu3ttN9EaYWe1Lr6EAAAAAHLmgijhL2N3ggrmfhAbl4Wh1trlyZUndmXQIUnV9JfMeRzMGyItk4lYmu22NiGuOePKWhhSCxUUpG8yy7gUGh</EncryptedPassword>
+    <History>False|2024-02-12T06:44:22.6377671Z;True|2024-02-07T17:41:27.8436420+05:00;True|2024-02-07T17:09:30.0912816+05:00;False|2024-02-06T13:10:40.3463544+05:00;False|2024-02-06T13:05:04.1236559+05:00;</History>
+    <LastFailureDetails />
+    <_PublishTargetUrl>ftp://66.165.248.146</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="appsettings.Development.json">
+      <publishTime>01/31/2024 19:03:29</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>02/06/2024 23:45:15</publishTime>
+    </File>
+    <File Include="Azure.Core.dll">
+      <publishTime>07/09/2023 22:50:30</publishTime>
+    </File>
+    <File Include="Azure.Identity.dll">
+      <publishTime>10/19/2023 00:59:42</publishTime>
+    </File>
+    <File Include="FOM.deps.json">
+      <publishTime>02/12/2024 12:24:51</publishTime>
+    </File>
+    <File Include="FOM.dll">
+      <publishTime>02/12/2024 12:24:41</publishTime>
+    </File>
+    <File Include="FOM.exe">
+      <publishTime>02/12/2024 12:24:41</publishTime>
+    </File>
+    <File Include="FOM.pdb">
+      <publishTime>02/12/2024 12:24:41</publishTime>
+    </File>
+    <File Include="FOM.runtimeconfig.json">
+      <publishTime>02/05/2024 20:06:19</publishTime>
+    </File>
+    <File Include="HtmlAgilityPack.dll">
+      <publishTime>01/29/2024 10:32:10</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Cryptography.Internal.dll">
+      <publishTime>01/12/2023 00:05:14</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Cryptography.KeyDerivation.dll">
+      <publishTime>01/12/2023 00:05:50</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.dll">
+      <publishTime>01/12/2023 00:06:34</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll">
+      <publishTime>01/12/2023 00:05:54</publishTime>
+    </File>
+    <File Include="Microsoft.Bcl.AsyncInterfaces.dll">
+      <publishTime>10/23/2021 04:47:36</publishTime>
+    </File>
+    <File Include="Microsoft.Data.SqlClient.dll">
+      <publishTime>01/27/2024 07:49:44</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.Abstractions.dll">
+      <publishTime>11/30/2023 18:13:40</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.dll">
+      <publishTime>11/30/2023 18:14:16</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.Relational.dll">
+      <publishTime>11/30/2023 18:14:34</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.SqlServer.dll">
+      <publishTime>11/30/2023 18:15:14</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Identity.Core.dll">
+      <publishTime>01/12/2023 00:05:52</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Identity.Stores.dll">
+      <publishTime>01/12/2023 00:05:52</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Options.dll">
+      <publishTime>11/30/2023 13:25:18</publishTime>
+    </File>
+    <File Include="Microsoft.Identity.Client.dll">
+      <publishTime>05/09/2023 23:25:28</publishTime>
+    </File>
+    <File Include="Microsoft.Identity.Client.Extensions.Msal.dll">
+      <publishTime>05/09/2023 23:31:58</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Abstractions.dll">
+      <publishTime>01/12/2023 09:56:56</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.JsonWebTokens.dll">
+      <publishTime>01/12/2023 09:34:00</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Logging.dll">
+      <publishTime>01/12/2023 09:35:22</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.dll">
+      <publishTime>01/12/2023 09:37:28</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll">
+      <publishTime>01/12/2023 09:48:08</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Tokens.dll">
+      <publishTime>01/12/2023 09:41:50</publishTime>
+    </File>
+    <File Include="Microsoft.SqlServer.Server.dll">
+      <publishTime>01/27/2022 22:19:08</publishTime>
+    </File>
+    <File Include="Microsoft.Win32.SystemEvents.dll">
+      <publishTime>10/23/2021 04:40:24</publishTime>
+    </File>
+    <File Include="runtimes/unix/lib/net6.0/Microsoft.Data.SqlClient.dll">
+      <publishTime>01/27/2024 07:49:42</publishTime>
+    </File>
+    <File Include="runtimes/unix/lib/net6.0/System.Drawing.Common.dll">
+      <publishTime>10/23/2021 04:51:42</publishTime>
+    </File>
+    <File Include="runtimes/win-arm/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/11/2023 23:56:28</publishTime>
+    </File>
+    <File Include="runtimes/win-arm64/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/11/2023 23:56:28</publishTime>
+    </File>
+    <File Include="runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/11/2023 23:56:18</publishTime>
+    </File>
+    <File Include="runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/11/2023 23:56:18</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/Microsoft.Data.SqlClient.dll">
+      <publishTime>01/01/0001 00:00:00</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll">
+      <publishTime>10/23/2021 04:40:18</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/System.Drawing.Common.dll">
+      <publishTime>10/23/2021 04:48:10</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/System.Runtime.Caching.dll">
+      <publishTime>10/23/2021 04:52:44</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll">
+      <publishTime>10/23/2021 04:51:04</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/System.Windows.Extensions.dll">
+      <publishTime>10/23/2021 04:49:58</publishTime>
+    </File>
+    <File Include="System.Configuration.ConfigurationManager.dll">
+      <publishTime>08/20/2022 00:58:02</publishTime>
+    </File>
+    <File Include="System.Drawing.Common.dll">
+      <publishTime>10/23/2021 04:49:12</publishTime>
+    </File>
+    <File Include="System.IdentityModel.Tokens.Jwt.dll">
+      <publishTime>01/12/2023 09:31:48</publishTime>
+    </File>
+    <File Include="System.Memory.Data.dll">
+      <publishTime>08/04/2021 21:45:54</publishTime>
+    </File>
+    <File Include="System.Runtime.Caching.dll">
+      <publishTime>10/23/2021 04:52:02</publishTime>
+    </File>
+    <File Include="System.Security.Cryptography.ProtectedData.dll">
+      <publishTime>10/23/2021 04:51:04</publishTime>
+    </File>
+    <File Include="System.Security.Permissions.dll">
+      <publishTime>10/23/2021 04:49:50</publishTime>
+    </File>
+    <File Include="System.Windows.Extensions.dll">
+      <publishTime>10/23/2021 04:49:44</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>02/12/2024 12:24:51</publishTime>
+    </File>
+    <File Include="wwwroot/assets/css/app.css">
+      <publishTime>02/07/2024 11:32:14</publishTime>
+    </File>
+    <File Include="wwwroot/assets/css/fom.css">
+      <publishTime>02/03/2024 16:03:53</publishTime>
+    </File>
+    <File Include="wwwroot/assets/fom.ico">
+      <publishTime>01/31/2024 12:58:20</publishTime>
+    </File>
+    <File Include="wwwroot/assets/foms.png">
+      <publishTime>01/31/2024 12:56:58</publishTime>
+    </File>
+    <File Include="wwwroot/assets/s.png">
+      <publishTime>02/07/2024 15:26:56</publishTime>
+    </File>
+    <File Include="wwwroot/assets/s.webp">
+      <publishTime>02/07/2024 15:29:09</publishTime>
+    </File>
+    <File Include="wwwroot/assets/sss.png">
+      <publishTime>02/04/2024 10:45:23</publishTime>
+    </File>
+    <File Include="wwwroot/calert.js">
+      <publishTime>02/01/2024 18:16:19</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/cat-action.svg">
+      <publishTime>01/31/2024 12:56:02</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/cat-animated.svg">
+      <publishTime>01/31/2024 12:54:18</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/cat-comedy.svg">
+      <publishTime>01/31/2024 12:53:27</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/cat-horror.svg">
+      <publishTime>01/31/2024 12:51:26</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/cat-scifi.svg">
+      <publishTime>01/31/2024 12:52:47</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/cat-series.svg">
+      <publishTime>01/31/2024 12:55:04</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/category-anime.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/category-movies.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/category-music.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/category-software.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/category-tvseries.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/categoryicon/category-video.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/fom.ico">
+      <publishTime>01/31/2024 12:58:20</publishTime>
+    </File>
+    <File Include="wwwroot/FOM.styles.css">
+      <publishTime>02/03/2024 17:14:10</publishTime>
+    </File>
+    <File Include="wwwroot/foms.png">
+      <publishTime>01/31/2024 12:56:58</publishTime>
+    </File>
+    <File Include="wwwroot/icons/calendar.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/category-ebook.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/category-games.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/category-movies.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/category-music.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/category-software.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/category-video.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/dislike.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/download-magnet.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/download-torrent.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/download.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/leacher.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/like.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/menu.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/search.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/seeder.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/size.svg">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/icons/star-svgrepo-com.svg">
+      <publishTime>02/10/2024 16:42:40</publishTime>
+    </File>
+    <File Include="wwwroot/icons/star.png">
+      <publishTime>02/10/2024 16:46:36</publishTime>
+    </File>
+    <File Include="wwwroot/s.png">
+      <publishTime>02/04/2024 10:45:23</publishTime>
+    </File>
+    <File Include="wwwroot/scripts/autocomplete.min.js">
+      <publishTime>02/10/2022 20:03:36</publishTime>
+    </File>
+    <File Include="wwwroot/scripts/script.js">
+      <publishTime>02/03/2024 15:43:38</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

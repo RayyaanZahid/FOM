@@ -1,0 +1,74 @@
+﻿@page "/Link/{slug?}"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@using System.Data
+
+
+<PageTitle>@("Redirecting in a moment" + " | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <meta property="og:title" name="description" content="Download free @Slug.Replace("-"," ") movies online. You can download every type of movie in elmovies.com " />
+</HeadContent>
+
+
+@if (string.IsNullOrEmpty(link))
+{
+    <main class="homepage-main">
+        <h1>Loading...</h1>
+    </main>
+    
+}
+
+else
+{
+    <main class="homepage-main">
+        <div class="container">
+
+            <div class="w3-row">
+                <div class="w3-col s12 text-center">
+                    <img src="../../../assets/s.webp" alt="elmovies.com" class="hp-large-logo" style="max-width: 300px" />
+                </div>
+                <div class="w3-col s12 text-center">
+                    <a class="btn btn-primary" href="@link" target="_blank">Click Here!</a>
+                </div>
+
+                
+
+
+            </div>
+        </div>
+    </main>
+    <script src="../../../scripts/script.js"></script>
+    }
+    @code {
+        [Parameter]
+        public string? Slug { get; set; } = null;
+
+    public string link = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        string decodedString = Uri.UnescapeDataString(Slug);
+        string val = decodedString;
+        string encrypt = val;
+        string decrypt = "";
+        for (int iChar = 0; iChar < encrypt.Length; iChar++)
+        {
+            decrypt += (char)(encrypt[iChar] - 3);
+        }
+        // string encrypt = "";
+        // for (int iChar = 0; iChar < val.Length; iChar++)
+        // {
+        //     encrypt += (char)(val[iChar] + 3);
+        // }
+
+        link = decrypt;
+    }
+}

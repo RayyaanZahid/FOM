@@ -1,0 +1,270 @@
+﻿@page "/w/{Slug}"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@using System.Data
+@using MyProject.Utils
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+@inject ICookie cookie
+
+<PageTitle>@($"{title} Watch Online | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <link rel="stylesheet" href="/assets/css/fom.css?ver=1.1">
+
+</HeadContent>
+
+<main class="homepage-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" style="width: 47px;" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+                    <form action="/series" class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search Your Desired Item here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+    <!-- End: Header -->
+
+    <div class="container mt-2">
+
+        <div class="container hide" id="alart-box">
+            <div class="view-box">
+                <span id="alart-message">message</span>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(title))
+        {
+            if (title == "Nothing Found")
+            {
+                <h1>Nothing Found!</h1>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-12 col-lg-8">
+                        <div class="row">
+
+                            <div class="col-12">
+
+                                <li class="search-result card my-2">
+                                    <div class="links center-flex hide-on-small">
+                                        <div class="ratio" style="--bs-aspect-ratio: 150%; min-width: 80px">
+                                            <img src="@img" alt="imgs">
+                                        </div>
+                                    </div>
+                                    <div class="info pl-md-0 pl-1">
+                                        <h5 class="m-0"><a> @title</a></h5>
+                                        <p class="alt-name m-0">@year</p>
+                                        <div class="mt-1 d-flex overflow-auto no-scroll-bar text-nowrap">
+                                            @foreach (var tag in titlesplit)
+                                            {
+                                                <a class="category">@tag</a>
+                                            }
+                                        </div>
+                                    </div>
+
+                                </li>
+                            </div>
+                            <div class="col-12">
+                                <div class="card" style="background:black">
+                                    <div class ="ratio ratio-16x9">
+                                        <iframe src="@linksplit.ElementAt(Ep)" style="position:absolute;top:0px;width:100%;height:100%;" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                                    </div>
+                                    
+                                
+                                    <div class="card-body p-2 overflow-auto">
+                                    </div>
+                                </div>
+                                <!--v-if-->
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <h5 class="text-muted fw-semibold mt-3">Episodes (@linksplit.Count())</h5>
+                            <div class="w3-col s12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div style="max-height: 300px; overflow-y: auto">
+                                            <div class="row gy-1 m-0 gx-1">
+                                                @foreach (var link in linksplit.Select((value, i) => new { i, value }))
+                                                {
+                                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                                        <a class="btn dark btn-block  w-100 text-white btn-primary" href="?q=@link.i">
+                                                            EP @(link.i + 1)
+                                                        </a>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <h5 class="title text-muted mb-1 mt-3">You may also like</h5>
+                        <div class="row">
+                            <div class="col-12">
+                                @foreach(var post in sposts)
+                                {
+                                    <li class="search-result card my-2">
+                                        <div class="links center-flex hide-on-small">
+                                            <div class="ratio" style="--bs-aspect-ratio: 150%; min-width: 80px">
+                                                <img src="@post.img" alt="imgs" class="">
+                                            </div>
+                                        </div>
+                                        <div class="info pl-md-0 pl-1">
+                                            <h5 class="title w-100 truncate mb-1"><a href="/w/@post.slug"> @post.title</a></h5>
+                                            <p class="alt-name m-0">@post.year</p>
+                                            <p class="alt-name m-0"><i class="fa-solid fa-star"></i> @post.category</p>
+                                        </div>
+
+                                    </li>
+                                }
+                                
+
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        }
+        else
+        {
+            <h1>Loading...</h1>
+        }
+
+    </div>
+    <div class="mb-2">&nbsp;</div>
+</main>
+
+
+
+
+@code {
+    [Parameter]
+    public string? Slug { get; set; } = null;
+
+    public string slug;
+    public string title;
+    public string category;
+    public string body;
+    public string meta;
+    public string img;
+    public string episodes;
+    public string year;
+    string[] titlesplit;
+    string[] linksplit;
+
+    public class spost()
+    {
+        public string slug;
+        public string title;
+        public string category;
+        public string img;
+        public string year;
+    }
+    List<spost> sposts = new List<spost>();
+
+    private async Task GetSeries()
+    {
+
+        DataSet Ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"if Exists (Select * from FOM.dbo.tblSeries where Slug='{Slug}')  Select * from FOM.dbo.tblSeries where Slug='{Slug}' ELSE  Select * from OEXAM.dbo.tblSeries where Slug='{Slug}'", conn);
+        cmd.Fill(Ds);
+        conn.Close();
+
+        if (Ds.Tables[0].Rows.Count >= 1)
+        {
+            title = Ds.Tables[0].Rows[0]["title"].ToString();
+            slug = Ds.Tables[0].Rows[0]["slug"].ToString();
+            category = Ds.Tables[0].Rows[0]["category"].ToString();
+            body = Ds.Tables[0].Rows[0]["body"].ToString();
+            meta = Ds.Tables[0].Rows[0]["meta"].ToString();
+            img = Ds.Tables[0].Rows[0]["img"].ToString();
+            episodes = Ds.Tables[0].Rows[0]["episodes"].ToString();
+            year = Ds.Tables[0].Rows[0]["year"].ToString();
+
+            titlesplit = category.Split(',');
+            linksplit = episodes.Replace("-(*)--(*)-", " ").Split(' ');
+            GetSSeries();
+        }
+        else
+        {
+            title = "Nothing Found";
+        }
+    }
+    private async Task GetSSeries()
+    {
+
+        DataSet Ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select top 5 * from FOM.dbo.tblSeries where category like '%{titlesplit.First()}%' and slug !='{Slug}' UNION Select top 5 * from OEXAM.dbo.tblSeries where category like '%{titlesplit.First()}%' and slug !='{Slug}' ", conn);
+        cmd.Fill(Ds);
+        conn.Close();
+
+        if (Ds.Tables[0].Rows.Count >= 1)
+        {
+            for (int i = 0; i < Ds.Tables[0].Rows.Count;i++)
+            {
+                spost sp = new spost();
+                sp.title = Ds.Tables[0].Rows[i]["title"].ToString();
+                sp.slug = Ds.Tables[0].Rows[i]["slug"].ToString();
+                sp.category = Ds.Tables[0].Rows[i]["category"].ToString();
+                sp.img = Ds.Tables[0].Rows[i]["img"].ToString();
+                sp.year = Ds.Tables[0].Rows[i]["year"].ToString();
+
+                sposts.Add(sp);
+            }
+            
+        }
+        
+    }
+    public int Ep = 0;
+    public string Eplink = "";
+
+    private void changeep(int ep)
+    {
+        Ep = ep;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        SaveViews.Save($"/w/{Slug}", HttpContextAccessor, Context);
+
+        GetSeries();
+        var uri = MyNavigationManager.ToAbsoluteUri(MyNavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var _code))
+        {
+            Ep = int.Parse(Convert.ToString(_code));
+            Eplink = linksplit.ElementAt(Ep);
+        }
+        
+    }
+}

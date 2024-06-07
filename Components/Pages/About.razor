@@ -1,0 +1,56 @@
+﻿
+@page "/About"
+@inject MyDbContext Context
+
+<PageTitle>@("#1 site to download movies | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <meta property="og:title" name="description" content="Download free movies online. You can download every type of movie in elmovies.com " />
+</HeadContent>
+
+<main class="homepage-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+                    <form action="search" class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search Your Desired Item here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+    <!-- End: Header -->
+    
+    <div class="container mt-2">
+        <h1>About</h1>
+        <p>elmovies.com is a movies listing website.</p>
+        <p>Our aim is making searching and downloading movies easier for everyone.</p>
+        <p>All the links are third-party so we do not own them.</p>
+    </div>
+    <div class="mb-2">&nbsp;</div>
+</main>
+
+
+
+
+@code {
+    protected override async void OnInitialized()
+    {
+
+        SaveViews.Save("/About", HttpContextAccessor, Context);
+
+    }
+}

@@ -1,0 +1,616 @@
+﻿@page "/{Slug}"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@using System.Data
+@using MyProject.Utils
+@using System.Text.RegularExpressions
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+@inject ICookie cookie
+
+<main class="homepage-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" style="width: 47px;" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+
+                    <form action="search" class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="/icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+
+
+    <!-- End: Header -->
+    <div class="sidebar-overlay overlay">
+        <div class="w3-sidebar">
+
+            <br><br><br>
+
+            <div class="collection">
+                <div class="collection-item"><a href="/Trending">Trending</a></div>
+                <div class="collection-item"><a href="/Latest">Latest</a></div>
+                <div class="collection-item"><a href="/ElAI">ElAI</a></div>
+
+            </div>
+
+            <div class="w3-bar-item w3-button">
+                <div class="w3-col">
+                    <div class="w3-col s6"></div>
+                    <div class="w3-col s6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-2"></div>
+    @if (posts == null)
+    {
+
+        <h3>Loading Posts....</h3>
+
+    }
+    else if (posts.Count <= 0)
+    {
+        <div class="container">
+
+            <div class="w3-row">
+                <div class="mb-2">&nbsp;</div>
+
+                <div class="w3-col s12 text-center">
+                    <h3>Nothing Found :(  Error <b>404</b></h3>
+                </div>
+                <div class="mb-2">&nbsp;</div>
+                <div class="w3-col s12 text-center">
+                    <h3>Try <b>ElAi</b> to look up your Movies</h3>
+                </div>
+                <div class="w3-col s12">
+                    <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+               
+
+
+            </div>
+        </div>
+    }
+    else
+    {
+        
+            var post = posts.First();
+            <PageTitle>@(post.Title + " | elmovies.com")</PageTitle>
+            <HeadContent>
+
+                <meta property="og:title" name="description" content="@post.Meta in elmovies.com" />
+            </HeadContent>
+            <div class="container hide" id="alart-box">
+                <div class="view-box">
+                    <span id="alart-message">message</span>
+                </div>
+            </div>
+
+            <div class="container" id="alart-box">
+                <div class="">
+
+                    <div class="details-box view-box">
+                        <div class="thumb">
+
+
+                            <div class="poster-image br-5" style="background-image: url('@post.Img')" alt="poster"></div>
+                        </div>
+                        @{
+                            titlesplit = post.Category.Split(',');
+                        }
+                        <div class="details">
+                            <h1 class="mt-0 title">@post.Title</h1>
+                            <div class="info-panel primary-text inline-children">
+               
+                                <a class="link-1 primary-bg y8truigr" @onclick="savelikes"><img src="/icons/like.svg" alt="Likes" style="transform: translateY(-2px)"> @post.Likes</a>
+                                <a class="link-1 primary-bg y8truigr" @onclick="savedislike"><img src="/icons/dislike.svg" alt="Dislikes">  @post.Dislikes</a>
+                            </div>
+                            <div class="mb-2"></div>
+                        
+                            <div class="info-panel primary-text inline-children">
+								@foreach (var tag in titlesplit)
+								{
+									@* <a class="link-1 primary-bg y8truigr" href="/Category/@tag">@tag</a> *@
+									<a class="link-1 primary-bg y8truigr" href="/Category/@tag"><img src="/icons/star.png" alt="cat" style="transform: translateY(-2px)"> @tag</a>
+
+                                    <div class="mb-2"></div>
+								}
+                            </div>
+                            
+                            <table class="stat-table">
+                                <tr>
+                                    <td><img src="/icons/download.svg" alt="" style="transform: translateY(-2px)"> Downloads</td>
+                                    <td>@post.Views</td>
+                                </tr>
+                                <tr>
+                                    <td><img src="/icons/calendar.svg" alt="" style="transform: translateY(-2px)"> Uploaded</td>
+                                    <td>@Convert.ToDateTime(post.DateInserted).ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            </table>
+                            <div class="mb-2"></div>
+                            <p>
+                                @post.Meta
+                            </p>
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="card-body view-box">
+                        <div>
+                            <div class="row gy-1 m-0 gx-1">
+                            
+                                @if (!string.IsNullOrWhiteSpace(post.Tlink1))
+                                {
+                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                        <a @onclick="savedviews" class="btn dark btn-block  w-100 text-white btn-@(post.Link1.Contains("magnet") ? "success" : "primary")" href="@post.Link1" target="_blank">
+                                            @post.Tlink1.Replace(" TORRENT", "")
+                                        </a>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(post.Tlink2))
+                                {
+                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                        <a @onclick="savedviews" class="btn dark btn-block  w-100 text-white btn-@(post.Link2.Contains("magnet") ? "success" : "primary")" href="@post.Link2" target="_blank">
+                                            @post.Tlink2.Replace(" TORRENT", "")
+                                        </a>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(post.Tlink3))
+                                {
+                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                        <a @onclick="savedviews" class="btn dark btn-block  w-100 text-white btn-@(post.Link3.Contains("magnet") ? "success" : "primary")" href="@post.Link3" target="_blank">
+                                            @post.Tlink3.Replace(" TORRENT", "")
+                                        </a>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(post.Tlink4))
+                                {
+                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                        <a @onclick="savedviews" class="btn dark btn-block  w-100 text-white btn-@(post.Link4.Contains("magnet") ? "success" : "primary")" href="@post.Link4" target="_blank">
+                                            @post.Tlink4.Replace(" TORRENT", "")
+                                        </a>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(post.Tlink5))
+                                {
+                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                        <a @onclick="savedviews" class="btn dark btn-block  w-100 text-white btn-@(post.Link5.Contains("magnet") ? "success" : "primary")" href="@post.Link5" target="_blank">
+                                            @post.Tlink5.Replace(" TORRENT", "")
+                                        </a>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(post.Tlink6))
+                                {
+                                    <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                        <a @onclick="savedviews" class="btn dark btn-block  w-100 text-white btn-@(post.Link6.Contains("magnet") ? "success" : "primary")" href="@post.Link6" target="_blank">
+                                            @post.Tlink6.Replace(" TORRENT", "")
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="col-12">
+                    <div class="card" style="background:black">
+                        <div class="ratio ratio-16x9"><iframe src="@frmurl" style="position:absolute;top:0px;width:100%;height:100%;" frameborder="0" scrolling="no" allowfullscreen=""></iframe></div>
+
+
+                        <div class="card-body p-2 overflow-auto"></div>
+                    </div>
+                </div>
+
+                <div class="card-body view-box">
+                    <div>
+                        <div class="row gy-1 m-0 gx-1">
+
+                        
+                                <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                <a @onclick="serv1" class="btn dark btn-block  w-100 text-white btn-primary">
+                                        Server 1
+                                    </a>
+                                     
+                                </div>
+                                
+                                <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                <a @onclick="serv2" class="btn dark btn-block  w-100 text-white btn-primary">
+                                        Server 2
+                                    </a>
+                                     
+                                </div>
+                                
+                                <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                <a @onclick="serv3" class="btn dark btn-block  w-100 text-white btn-primary">
+                                        Server 3
+                                    </a>
+                                     
+                                </div>
+
+                            <div class="col-4  col-sm-3 col-md-2  col-xl-2" v-key="index">
+                                <a @onclick="serv4" class="btn dark btn-block  w-100 text-white btn-primary">
+                                    Server 4
+                                </a>
+
+                            </div>
+                          
+                           
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <div class="mb-2"></div>
+
+                <div class="w-100 text-center"><b>Similar Movies</b></div>
+                <div class="mb-2"></div>
+
+                <div class="row">
+                    <div class="col-12">
+                        @foreach (var spost in sposts)
+                        {
+                            <li class="search-result view-box">
+                                <div class="links center-flex ">
+                                    <div class="ratio" style="--bs-aspect-ratio: 120%; min-width: 100px">
+                                        <img src="@spost.Img" alt="" class="br-5">
+                                    </div>
+                                </div>
+                                <div class="info pl-md-0 pl-1">
+                                    <h5 class="title w-100 truncate mb-1">
+                                        <a href="@spost.Slug" >
+                                            @spost.Title
+                                        </a>
+                                    </h5>
+                                    <p class="alt-name m-0"><i class="fa-solid fa-star"></i> @spost.Year</p>
+                                    <div class="mt-1 d-flex overflow-auto no-scroll-bar text-nowrap">
+                                        <a href="/Category/@spost.Mcategory" class="category"> @spost.Mcategory</a>
+                                    </div>
+                                </div>
+                                <div class="links center-flex hide-on-small px-3">
+
+                                    @if (!string.IsNullOrWhiteSpace(post.Tlink1))
+                                    {
+                                        <a href="@spost.Link1" rel="noreferrer" target="_blank" class="dl-@(post.Link1.Contains("magnet") ? "magnet" : "torrent")">
+                                            <img src="/icons/download-@(post.Link1.Contains("magnet") ? "magnet" : "torrent").svg" alt="Torrent" title="Download  file">
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(post.Tlink2))
+                                    {
+                                        <a href="@spost.Link2" class="dl-@(post.Link2.Contains("magnet") ? "magnet" : "torrent")">
+                                            <img src="/icons/download-@(post.Link2.Contains("magnet") ? "magnet" : "torrent").svg" alt="Magnet" title="Magnet Link">
+                                        </a>
+                                    }
+
+
+                                </div>
+                            </li>
+                        }
+
+                    </div>
+
+
+                </div>
+            </div>
+
+
+       
+
+    }
+
+
+    <div class="mb-2">&nbsp;</div>
+</main>
+
+
+
+
+@code {
+    [Parameter]
+    public string? Slug { get; set; } = null;
+
+    string[] titlesplit;
+
+    private const int KeyValues = 1;
+    //private TblPost posts = new();
+    List<TblPost> posts = new List<TblPost>();
+    public string error;
+    List<TblPost> sposts = new List<TblPost>();
+
+    public List<TblPost> GetuniqueBank(string bankname)
+    {
+        List<TblPost> ls = new List<TblPost>();
+
+        ls = Context.TblPosts.Where(x => x.Slug == bankname).ToList();
+        DataSet ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select Top 1 * from OEXAM.dbo.tblposts where slug ='{bankname}' order by DateInserted desc", conn);
+        cmd.Fill(ds);
+        conn.Close();
+        //error = ds.Tables[0].Rows[0]["title"].ToString();
+        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+        {
+            TblPost tg = new TblPost();
+            tg.Pid = int.Parse(ds.Tables[0].Rows[i]["pid"].ToString());
+            tg.Slug = ds.Tables[0].Rows[i]["slug"].ToString();
+            tg.Likes = int.Parse(ds.Tables[0].Rows[i]["likes"].ToString());
+            tg.Dislikes = int.Parse(ds.Tables[0].Rows[i]["dislikes"].ToString());
+            tg.Views = int.Parse(ds.Tables[0].Rows[i]["views"].ToString());
+            tg.Category = ds.Tables[0].Rows[i]["category"].ToString();
+            tg.Tags = ds.Tables[0].Rows[i]["tags"].ToString();
+            tg.Size = ds.Tables[0].Rows[i]["size"].ToString();
+            tg.Mcategory = ds.Tables[0].Rows[i]["mcategory"].ToString();
+            tg.Title = ds.Tables[0].Rows[i]["title"].ToString();
+            tg.Body = ds.Tables[0].Rows[i]["body"].ToString();
+            tg.Img = ds.Tables[0].Rows[i]["img"].ToString();
+            tg.Tlink1 = ds.Tables[0].Rows[i]["tlink1"].ToString();
+            tg.Link1 = ds.Tables[0].Rows[i]["link1"].ToString();
+            tg.Tlink2 = ds.Tables[0].Rows[i]["tlink2"].ToString();
+            tg.Link2 = ds.Tables[0].Rows[i]["link2"].ToString();
+            tg.Tlink3 = ds.Tables[0].Rows[i]["tlink3"].ToString();
+            tg.Link3 = ds.Tables[0].Rows[i]["link3"].ToString();
+            tg.Tlink4 = ds.Tables[0].Rows[i]["tlink4"].ToString();
+            tg.Link4 = ds.Tables[0].Rows[i]["link4"].ToString();
+            tg.Tlink5 = ds.Tables[0].Rows[i]["tlink5"].ToString();
+            tg.Link5 = ds.Tables[0].Rows[i]["link5"].ToString();
+            tg.Year = int.Parse(ds.Tables[0].Rows[i]["year"].ToString());
+            tg.Meta = ds.Tables[0].Rows[i]["meta"].ToString();
+            tg.Tlink6 = ds.Tables[0].Rows[i]["tlink6"].ToString();
+            tg.Link6 = ds.Tables[0].Rows[i]["link6"].ToString();
+            tg.DateInserted = Convert.ToDateTime(ds.Tables[0].Rows[i]["DateInserted"].ToString());
+            ls.RemoveAll(x => x.Slug == tg.Slug);
+            ls.Add(tg);
+        }
+        return ls;
+
+        return Context.TblPosts.Where(x => x.Slug == bankname).ToList();
+    }
+    public List<TblPost> GetuniqueBank1(string bankname)
+    {
+        List<TblPost> ls = new List<TblPost>();
+
+        ls = Context.TblPosts.Where(x => x.Mcategory.Trim().ToLower().Contains(bankname.Trim().ToLower()) && x.Slug != posts.First().Slug).OrderByDescending(x => x.Year).Take(10).ToList();
+        DataSet ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select Top 10 * from OEXAM.dbo.tblposts where mcategory='{bankname.Trim().ToLower()}' and slug !='{posts.First().Slug}' order by Year desc", conn);
+        cmd.Fill(ds);
+        conn.Close();
+        //error = ds.Tables[0].Rows[0]["title"].ToString();
+        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+        {
+            TblPost tg = new TblPost();
+            tg.Title = ds.Tables[0].Rows[i]["title"].ToString();
+            tg.Slug = ds.Tables[0].Rows[i]["slug"].ToString();
+            tg.Likes = int.Parse(ds.Tables[0].Rows[i]["likes"].ToString());
+            tg.Dislikes = int.Parse(ds.Tables[0].Rows[i]["dislikes"].ToString());
+            tg.Mcategory = ds.Tables[0].Rows[i]["mcategory"].ToString();
+            tg.Size = ds.Tables[0].Rows[i]["size"].ToString();
+            ls.RemoveAll(x=> x.Slug == tg.Slug);
+            ls.Add(tg);
+        }
+        return ls;
+    }
+    public class spost()
+    {
+        public String Title;
+        public String Slug;
+        public String like;
+        public String dislike;
+        public String Mcategory;
+        public String size;
+    }
+    private async Task savelikes()
+    {
+        string _message = await cookie.GetValue(posts.First().Slug.ToString());
+
+        if (string.IsNullOrEmpty(_message))
+        {
+            SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+            conn.Open();
+            SqlCommand cmd = new SqlCommand($"Update tblposts set likes='{posts.First().Likes.Value + 1}' where slug='{posts.First().Slug}';Update OEXAM.dbo.tblposts set likes='{posts.First().Likes.Value + 1}' where slug='{posts.First().Slug}' ", conn);
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            posts.First().Likes = posts.First().Likes.Value + 1;
+
+            await cookie.SetValue(posts.First().Slug.ToString(), "disliked");
+
+        }
+
+    }
+    // private void GetSposts()
+    // {
+    //     DataSet ds = new DataSet();
+    //     SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+    //     conn.Open();
+    //     SqlDataAdapter cmd = new SqlDataAdapter($"Select Top 10 * from tblposts where mcategory='{posts.First().Mcategory}' and slug !='{posts.First().Slug}' order by DateInserted desc", conn);
+    //     cmd.Fill(ds);
+    //     conn.Close();
+    //     error = ds.Tables[0].Rows[0]["title"].ToString();
+    //     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+    //     {
+    //         spost tg = new spost();
+    //         tg.Title = ds.Tables[0].Rows[i]["title"].ToString();
+    //         tg.Slug = ds.Tables[0].Rows[i]["slug"].ToString();
+    //         tg.like = ds.Tables[0].Rows[i]["likes"].ToString();
+    //         tg.dislike = ds.Tables[0].Rows[i]["dislikes"].ToString();
+    //         tg.Mcategory = ds.Tables[0].Rows[i]["mcategory"].ToString();
+    //         tg.size = ds.Tables[0].Rows[i]["size"].ToString();
+    //         sposts.Add(tg);
+    //     }
+    // }
+    private void savedviews()
+    {
+
+
+
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlCommand cmd = new SqlCommand($"Update tblposts set views='{posts.First().Views.Value + 1}' where slug='{posts.First().Slug}'; Update OEXAM.dbo.tblposts set views='{posts.First().Views.Value + 1}' where slug='{posts.First().Slug}' ", conn);
+        cmd.ExecuteNonQuery();
+        conn.Close();
+        posts.First().Views = posts.First().Views.Value + 1;
+
+
+
+
+    }
+    public string imdbid;
+    public string tmdbid;
+    string getimdbid(string qry)
+    {
+        string inputString = qry;
+
+        // Regular expression pattern to extract the IMDb URL
+        string pattern = @"https:\/\/www\.imdb\.com\/title\/tt\d+";
+
+        // Search for the pattern in the input string
+        Match match = Regex.Match(inputString, pattern);
+
+        // Check if a match is found
+        return match.Value;
+    }
+    string gettmdbid(string qry)
+    {
+        string inputString = qry;
+
+        // Regular expression pattern to extract the IMDb URL
+        string pattern = @"(?:https?:\/\/)?(?:www\.)?themoviedb\.org\/movie\/\d+";
+
+        // Search for the pattern in the input string
+        Match match = Regex.Match(inputString, pattern);
+
+        // Check if a match is found
+        return match.Value;
+    }
+
+    private async Task GETMDB()
+    {
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://www.google.com/search?q={Slug.ToLower().Replace("-", "+")}+imdb&tbm=isch&ved=2ahUKEwizzPjdvpGEAxWyZaQEHehHBDkQ2-cCegQIABAA&oq=boboiboy+movie+2+imdb&gs_lp=EgNpbWciFWJvYm9pYm95IG1vdmllIDIgaW1kYjIHEAAYgAQYGEi9I1C8B1i4H3AAeACQAQCYAdgBoAGoC6oBAzItN7gBA8gBAPgBAYoCC2d3cy13aXotaW1nwgIEECMYJ8ICBhAAGAgYHsICCBAAGAcYHhgKwgIFEAAYgASIBgE&sclient=img&ei=uWi_ZfOLNbLLkdUP6I-RyAM&bih=1080&biw=1920&hl=en");
+        imdbid = getimdbid(page).Replace("https://www.imdb.com/title/", "").Replace("https://imdb.com/title/", "").Replace("/","");
+
+
+        string page2 = await client.GetStringAsync($"https://www.google.com/search?q={Slug.ToLower().Replace("-", "+")}+tmdb&tbm=isch&ved=2ahUKEwizzPjdvpGEAxWyZaQEHehHBDkQ2-cCegQIABAA&oq=boboiboy+movie+2+imdb&gs_lp=EgNpbWciFWJvYm9pYm95IG1vdmllIDIgaW1kYjIHEAAYgAQYGEi9I1C8B1i4H3AAeACQAQCYAdgBoAGoC6oBAzItN7gBA8gBAPgBAYoCC2d3cy13aXotaW1nwgIEECMYJ8ICBhAAGAgYHsICCBAAGAcYHhgKwgIFEAAYgASIBgE&sclient=img&ei=uWi_ZfOLNbLLkdUP6I-RyAM&bih=1080&biw=1920&hl=en");
+        tmdbid = gettmdbid(page2).Replace("https://www.themoviedb.org/movie/", "").Replace("https://themoviedb.org/movie/", "").Replace("/", "");
+
+
+        frmurl = "https://vidsrc.xyz/embed/movie?imdb=" + imdbid;
+        if(string.IsNullOrEmpty(imdbid))
+        {
+            frmurl = "https://vidsrc.xyz/embed/movie?tmdb=" + tmdbid;
+        }
+
+
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlCommand cmd = new SqlCommand($"Update tblPosts Set imdbid = '{imdbid}' WHERE NOT EXISTS (SELECT 1 FROM tblPosts WHERE imdbid = '{imdbid}') and slug ='{Slug}';  Update OEXAM.dbo.tblPosts Set imdbid = '{imdbid}' WHERE NOT EXISTS (SELECT 1 FROM OEXAM.dbo.tblPosts WHERE imdbid = '{imdbid}') and slug ='{Slug}'", conn);
+        SqlCommand cmd2 = new SqlCommand($"Update tblPosts Set tmdbid = '{tmdbid}' WHERE NOT EXISTS (SELECT 1 FROM tblPosts WHERE tmdbid = '{tmdbid}') and slug ='{Slug}' Update OEXAM.dbo.tblPosts Set tmdbid = '{tmdbid}' WHERE NOT EXISTS (SELECT 1 FROM OEXAM.dbo.tblPosts WHERE tmdbid = '{tmdbid}') and slug ='{Slug}'", conn);
+
+        cmd.ExecuteNonQuery();
+        cmd2.ExecuteNonQuery();
+        conn.Close();
+        
+
+    }
+    public string frmurl;
+    private void serv1()
+    {
+        frmurl = "https://vidsrc.xyz/embed/movie?imdb=" + imdbid;
+    }
+    private void serv2()
+    {
+        frmurl = "https://2embed.skin/embed/" + imdbid;
+    }
+    private void serv3()
+    {
+        frmurl = "https://vidsrc.xyz/embed/movie?tmdb=" + tmdbid;
+    }
+    private void serv4()
+    {
+        frmurl = "https://2embed.skin/embed/" + tmdbid;
+    }
+    private async Task savedislike()
+    {
+        string _message = await cookie.GetValue(posts.First().Slug.ToString());
+
+        if (string.IsNullOrEmpty(_message))
+        {
+            SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+            conn.Open();
+            SqlCommand cmd = new SqlCommand($"Update tblposts set dislikes='{posts.First().Dislikes.Value + 1}' where slug='{posts.First().Slug}';Update OEXAM.dbo.tblposts set dislikes='{posts.First().Dislikes.Value + 1}' where slug='{posts.First().Slug}' ", conn);
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            posts.First().Dislikes = posts.First().Dislikes.Value + 1;
+
+            await cookie.SetValue(posts.First().Slug.ToString(), "disliked");
+
+        }
+
+    }
+
+    private  async Task getCookie(string name)
+    {
+
+        string _message = await cookie.GetValue("mytest20");
+
+
+    }
+    void abc()
+    {
+
+    }
+    private string LINK(string val)
+    {
+        string encrypt = "";
+        for (int iChar = 0; iChar < val.Length; iChar++)
+        {
+            encrypt += (char)(val[iChar] + 3);
+        }
+        return "/Link/"+ encrypt;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        posts = GetuniqueBank(Slug);
+        await GETMDB();
+
+
+        SaveViews.Save($"/{Slug}", HttpContextAccessor, Context);
+
+        if(posts.Count > 0)
+        {
+            sposts = GetuniqueBank1(posts.FirstOrDefault().Mcategory);
+        }
+    }
+}
+

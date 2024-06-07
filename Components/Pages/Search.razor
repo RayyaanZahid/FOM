@@ -1,0 +1,542 @@
+﻿@page "/Search"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@using System.Data
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+
+<PageTitle>@("Search Online Movies Free Download | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <meta property="og:title" name="description" content="Download free movies online. You can download every type of movie in elmovies.com " />
+</HeadContent>
+
+<main class="homepage-main">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" style="width: 47px;" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+                    <form class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search Your Desired Item here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+    <!-- End: Header -->
+    <div class="sidebar-overlay overlay">
+        <div class="w3-sidebar">
+
+            <br><br><br>
+
+            <div class="collection">
+                <div class="collection-item"><a href="trending">Trending</a></div>
+                <div class="collection-item"><a href="latest">Latest</a></div>
+            </div>
+
+            <div class="w3-bar-item w3-button">
+                <div class="w3-col">
+                    <div class="w3-col s6"></div>
+                    <div class="w3-col s6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-2">
+
+        <div class="w3-row">
+            <div class="w3-col s12">
+                <div class="movie-search">
+                    <form id="autocomplete" style="max-height: 200px;">
+                        <div class="mt-3">
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text" id="basic-addon-search31"><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                                <input type="text" class="form-control form-control-lg" placeholder="Search Here..." name="q" value="">
+                                <button class="btn btn-primary" type="submit">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            @if (sposts == null)
+            {
+                <div class="mb-2">&nbsp;</div>
+                <h3>Loading..</h3>
+
+            }
+            else if (sposts.Count == 0)
+            {
+             
+            }
+            else
+            {
+                <div class="col-12">
+                        <div class="w3-bar mt-2 search-stats">
+                            <!-- Center -->
+                            <h5 class="fw-semibold mt-5"><b>Series</b></h5>
+                        </div>
+                    </div>
+                <div class="row">
+                    
+                    <div class="col-12">
+                        <div class="row gy-3 movie-grid">
+                            @foreach (var post in sposts)
+                            {
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="card">
+                                        <div class="poster-container">
+                                            <a href="../../../w/@post.slug">
+                                                <div class="poster-image card-img-top"
+                                                     style="background-image: url(@post.img);">
+                                                </div>
+                                            </a>
+                                            <div class="poster-overlay">
+                                                <div>
+                                                    @post.category
+                                                </div>
+                                                <a href="../../../w/@post.slug"
+                                                   class="primary-bg br-5"
+                                                   style="color:#364A63; font-size:15px;padding:5px 10px; transition: 100ms">Watch</a>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h5 class="title truncate m-0 fw-semibold"><a class="text-dark" href="../../../w/@post.slug">@post.title</a></h5>
+                                            <div class="text-muted">@post.year</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            }
+                            @if(sposts.Count > 5)
+                            {
+                            <a href="/series?q=@Qry">View More</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+            @if (posts.Count <= 0)
+            {
+                <div class="container">
+
+                    <div class="w3-row">
+                        <div class="mb-2">&nbsp;</div>
+
+                        <div class="mb-2">&nbsp;</div>
+                        <div class="w3-col s12 text-center">
+                            <h3>Try <b>ElAi</b> to look up your Movies</h3>
+                        </div>
+                        <div class="w3-col s12">
+                            <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                                <img src="icons/search.svg" alt="">
+                                <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                                <ul class="autocomplete-result-list"></ul>
+                                <button type="submit">Search</button>
+                            </form>
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+
+            }
+            else if (posts == null)
+            {
+                <div class="mb-2">&nbsp;</div>
+                <h3>Loading...</h3>
+            }
+            else
+            {
+                
+                <div class="col-12">
+                    <div class="w3-bar mt-2 search-stats">
+                        <!-- Center -->
+                        <h5 class="fw-semibold mt-5"> <b>Movies</b> </h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <ul class="col-12" >
+                        @foreach (var post in posts)
+                        {
+
+                            <li class="search-result view-box">
+                                <div class="links center-flex ">
+                                    <div class="ratio" style="--bs-aspect-ratio: 120%; min-width: 100px">
+                                        <img src="@post.Img" alt="" class="br-5">
+                                    </div>
+                                </div>
+                                <div class="info pl-md-0 pl-1">
+                                    <h5 class="title w-100 truncate mb-1">
+                                        <a href="/@post.Slug">
+                                            @post.Title
+                                        </a>
+                                    </h5>
+                                    <p class="alt-name m-0"><i class="fa-solid fa-star"></i> @post.Year</p>
+                                    <div class="mt-1 d-flex overflow-auto no-scroll-bar text-nowrap">
+                                        <a href="/Category/@post.Mcategory" class="category"> @post.Mcategory</a>
+                                    </div>
+                                </div>
+                                <div class="links center-flex hide-on-small px-3">
+
+                                    @if (!string.IsNullOrWhiteSpace(post.Tlink1))
+                                    {
+                                        <a href="@post.Link1" rel="noreferrer" target="_blank" class="dl-@(post.Tlink1.Contains("Magnet") ? "magnet" : "torrent")">
+                                            <img src="/icons/download-@(post.Tlink1.Contains("Magnet") ? "magnet" : "torrent").svg" alt="Torrent" title="Download  file">
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(post.Tlink2))
+                                    {
+                                        <a href="@post.Link2" class="dl-@(post.Tlink1.Contains("Magnet") ? "magnet" : "torrent")">
+                                            <img src="/icons/download-@(post.Tlink1.Contains("Magnet") ? "magnet" : "torrent").svg" alt="Magnet" title="Magnet Link">
+                                        </a>
+                                    }
+
+
+                                </div>
+                            </li>
+
+
+                       
+
+                        }
+                    </ul>
+                </div>
+             
+            }
+
+            @if(Links.Count > 0)
+            {
+                <div class="mb-2">&nbsp;</div>
+
+                <div class="row">
+
+                    <div class="w-100 text-center"><b>Torrents</b></div>
+                    @foreach (var link in Links)
+                    {
+                        <li class="card search-result my-2">
+                            <div class="info pl-md-0 pl-1">
+                                <div class="mb-2"></div>
+
+                                <h5 class="title w-100 truncate mb-1 "><a href="@link.link" data-token="">@link.name</a></h5>
+                                <p>@link.from</p>
+                                <div class="mb-2"></div>
+
+                            </div>
+
+                            <div class="links center-flex px-3">
+                                <a href="@link.link" rel="noreferrer" target="_blank" class="dl-magnet"><img src="/icons/download-magnet.svg" alt="Torrent" title="Download .torrent file"></a>
+                            </div>
+                        </li>
+                    }
+
+
+                </div>
+            }
+            @{
+                string qry = "";
+                var uri = MyNavigationManager.ToAbsoluteUri(MyNavigationManager.Uri);
+                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var _code))
+                {
+                    qry = Convert.ToString(_code);
+                }
+            }
+            <div class="pagination text-right">
+                @if (!(1 >= pageindex))
+                {
+                    <a href="?page=@(pageindex-1)&q=@qry" class="w3-bar-item dual-image-switch-on-hover">◀</a>
+                }
+
+                @if (!(totalpage <= pageindex))
+                {
+                    <a href="?page=@(pageindex+1)&q=@qry" class="w3-bar-item dual-image-switch-on-hover">▶</a>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    <div class="mb-2"></div>
+</main>
+
+
+@code {
+    [Parameter]
+    public string? Slug { get; set; }
+    public int totalpage { get; set; }
+    public int pageindex { get; set; }
+    public int pagesize { get; set; }
+    public string qry { get; set; }
+
+    List<TblPost> posts = new List<TblPost>();
+    private string CurrentValue { get; set; } = "";
+    public List<TblPost> GetuniqueBank(string bankname)
+    {
+        string[] list = bankname.Split(' ');
+        string cmdq = "where ";
+        foreach (var wrd in list)
+        {
+            cmdq += $"title like '%{wrd}%' and ";
+        }
+        cmdq += "and";
+        var posts = (from p in Context.TblPosts
+                     where list.All(w => p.Title.Contains(w))
+                     select p).ToList();
+
+        List<TblPost> ls = new List<TblPost>();
+
+        ls = posts;
+       
+        return ls;
+    }
+    public List<TblPost> getposts()
+    {
+        List<TblPost> ls = new List<TblPost>();
+
+        ls = Context.TblPosts.ToList();
+  
+        return ls;
+    }
+
+    public class spost()
+    {
+        public string slug;
+        public string title;
+        public string category;
+        public string img;
+        public string year;
+    }
+    List<spost> sposts = new List<spost>();
+
+    private async Task GetSSeries()
+    {
+
+
+        DataSet Ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select Top 6 * from tblSeries", conn);
+        cmd.Fill(Ds);
+        conn.Close();
+        sposts.Clear();
+        if (Ds.Tables[0].Rows.Count >= 1)
+        {
+            for (int i = 0; i < Ds.Tables[0].Rows.Count; i++)
+            {
+                spost sp = new spost();
+                sp.title = Ds.Tables[0].Rows[i]["title"].ToString();
+                sp.slug = Ds.Tables[0].Rows[i]["slug"].ToString();
+                sp.category = Ds.Tables[0].Rows[i]["category"].ToString();
+                sp.img = Ds.Tables[0].Rows[i]["img"].ToString();
+                sp.year = Ds.Tables[0].Rows[i]["year"].ToString();
+
+                sposts.Add(sp);
+            }
+
+        }
+
+    }
+    public class Link()
+    {
+        public string name;
+        public string link;
+        public string from;
+    }
+    List<Link> Links = new List<Link>();
+    private async Task Get1337x(string qry)
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://bitsearch.to/search?q={qry.ToLower().Replace(" ", "+")}");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//li[@class='card search-result my-2']");//this xpath selects all span tag having its class as hidden first
+
+        //Getpkspeeddonwloand(itemList.First().Attributes["href"].Value);
+
+        int i = 0;
+        string cpy = "";
+        try
+        {
+            if (itemList.Count > 1)
+            {
+                foreach (var item in itemList.Select((value, i) => new { i, value }).Take(5))
+                {
+                    Link lk = new Link();
+
+
+
+                    lk.link = item.value.SelectNodes("//div[@class='links center-flex hide-on-small px-3']/a[@class='dl-magnet']").ElementAt(item.i).Attributes["href"].Value.Replace("&amp;", "&").Replace("&#x3D;", "=").Replace("Bitsearch.to", "elmovies.com");
+                    lk.name = item.value.SelectNodes("//div[@class='info px-3 pt-2 pb-3']/div/h5/a").ElementAt(item.i).InnerText;
+                    lk.from = "Torrents-" + ((lk.name.Contains("2160p")) ? "2160p" : (lk.name.Contains("1080p")) ? "1080p" : "720p");
+                    Links.Add(lk);
+
+
+                    i++;
+                }
+
+
+            }
+            else
+            {
+
+                //error = "No Movie found, Please Enter Similar name of movie you are looking for1!";
+            }
+
+
+
+
+        }
+        catch (Exception ex)
+        {
+            // Title = "Nothing Found!";
+            // error = ex.Message;
+
+        }
+
+
+    }
+    private async Task GetSSeriesS(string qrys)
+    {
+
+        string[] list = qrys.Split(' ');
+        string cmdq = "where ";
+        foreach(var wrd in list)
+        {
+            cmdq += $"title like '%{wrd}%' and ";
+        }
+        cmdq += "and";
+        DataSet Ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select Top 6 * from tblSeries {cmdq.Replace("and and", "")} ", conn);
+        cmd.Fill(Ds);
+        conn.Close();
+        sposts.Clear();
+        if (Ds.Tables[0].Rows.Count >= 1)
+        {
+            for (int i = 0; i < Ds.Tables[0].Rows.Count; i++)
+            {
+                spost sp = new spost();
+                sp.title = Ds.Tables[0].Rows[i]["title"].ToString();
+                sp.slug = Ds.Tables[0].Rows[i]["slug"].ToString();
+                sp.category = Ds.Tables[0].Rows[i]["category"].ToString();
+                sp.img = Ds.Tables[0].Rows[i]["img"].ToString();
+                sp.year = Ds.Tables[0].Rows[i]["year"].ToString();
+
+                sposts.Add(sp);
+            }
+
+        }
+
+    }
+    public string Qry;
+    private void navigate()
+    {
+        posts = getposts();
+        var uri = MyNavigationManager.ToAbsoluteUri(MyNavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var _code))
+        {
+            qry = Convert.ToString(_code);
+        }
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("page", out var _page))
+        {
+            pageindex = Convert.ToInt32(_page);
+
+        }
+        else
+        {
+            pageindex = 1;
+        }
+
+        if (!string.IsNullOrWhiteSpace(qry))
+        {
+            posts.Clear();
+            posts = GetuniqueBank(qry);
+        }
+        pagesize = 10;
+        IQueryable<TblPost> query = posts.AsQueryable();
+        decimal count = query.Count();
+        totalpage = (int)Math.Ceiling(count / (int)pagesize);
+        query = query.Skip((pageindex - 1) * (int)pagesize).Take((int)pagesize);
+        posts = query.ToList();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        //await Task.Delay(1000);
+        posts = getposts();
+        await GetSSeries();
+        SaveViews.Save($"/Search", HttpContextAccessor, Context);
+
+        string qry = "";
+        var uri = MyNavigationManager.ToAbsoluteUri(MyNavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var _code))
+        {
+            qry = Convert.ToString(_code);
+            Qry = qry;
+            
+            SaveViews.Save($"/Search?q={Qry}", HttpContextAccessor, Context);
+            try
+            {
+                await Get1337x(qry);
+
+            }
+            catch(Exception ex)
+            {
+                return;
+            }
+        }
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("page", out var _page))
+        {
+            pageindex = Convert.ToInt32(_page);
+
+        }
+        else
+        {
+            pageindex = 1;
+        }
+
+        if (!string.IsNullOrWhiteSpace(qry))
+        {
+            sposts.Clear();
+            await GetSSeriesS(qry);
+            posts.Clear();
+            posts = GetuniqueBank(qry);
+            
+        }
+       
+        pagesize = 10;
+        IQueryable<TblPost> query = posts.AsQueryable();
+        decimal count = query.Count();
+        totalpage = (int)Math.Ceiling(count / (int)pagesize);
+        query = query.Skip((pageindex - 1) * (int)pagesize).Take((int)pagesize);
+        posts = query.ToList();
+
+
+        
+    }
+}

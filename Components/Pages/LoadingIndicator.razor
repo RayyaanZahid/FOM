@@ -1,0 +1,12 @@
+﻿<!-- LoadingIndicator.razor -->
+@if (IsLoading)
+{
+    <div class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+}

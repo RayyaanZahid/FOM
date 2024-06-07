@@ -1,0 +1,110 @@
+﻿@inherits LayoutComponentBase
+@inject IWebHostEnvironment env
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" href="../../../assets/ellogo.ico" />
+    <link rel='stylesheet' href='../../../assets/css/fom.css?ver=1.2' />
+    <link rel='stylesheet' href='../../../assets/css/app.css?ver=1.2' />
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    @{
+        string val = File.ReadAllText(@$"{env.WebRootPath}\scripts\Scripts.txt");
+       
+    }
+    @((MarkupString)val)
+@*     <script type='text/javascript' src='//pl22876435.profitablegatecpm.com/74/a5/f6/74a5f62b149e895abee4fa41d397e92e.js'></script>
+ *@    <HeadOutlet />
+</head>
+
+
+<body>
+@*     <div class="withAnimation" style="display:none" id="loader"></div>
+ *@@*     <div class="spg-loader-top-loading-bar" style="display:none" id="loader"></div>
+ *@
+    <Routes />
+
+    <div class="loading" style="display:none" id="loader">Loading&#8230;</div>
+
+@*    <div data—permanent>
+       <dialog id="blazor-global-loader">
+           <p>Loading...</p>
+       </dialog>
+   </div> *@
+    <script src="_framework/blazor.web.js"></script>
+    <script>
+        const loader = document.getElementById('blazor-global-loader');
+        const { fetch: originalFetch } = window;
+        window.fetch = async (...args) => {
+            const [url, options] = args;
+            if (options.headers && options.headers['accept'] && options.headers['accept'].includes('blazor-enhanced-nav')) {
+                // Show Loader
+                console.log('Show Loader');
+                var x = document.getElementById("loader");
+                x.style.display = "block";
+            }
+            return await originalFetch(...args);
+        }
+
+        Blazor.addEventListener('enhancedload', function () {
+            console.log('hide Loader');
+            var x = document.getElementById("loader");
+            x.style.display = "none";
+        });
+
+    </script>
+
+    <script src="../../../scripts/script.js"></script>
+    <script src="../../../scripts/calert.js"></script>
+    <script async data-id="101444237" src="//static.getclicky.com/js"></script>
+@* <script async data-id="101442774" src="//static.getclicky.com/js"></script>
+ *@    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+@*     <script type='text/javascript' src='//pl22876658.profitablegatecpm.com/e6/71/d7/e671d782c913051a2dbda0c699b57618.js'></script>
+ *@    @* <script src="_framework/blazor.web.js"></script> *@
+    @* <script>
+        const loader = document.getElementById('blazor-global-loader');
+        const { fetch: originalFetch } = window;
+        window.fetch = async (...args) => {
+            const [url, options] = args;
+            if (options.headers && options.headers['accept'] && options.headers['accept'].includes('blazor-enhanced-nav')) {
+                // Show Loader
+                console.log('Show Loader');
+                loader.showModal();
+            }
+            return await originalFetch(...args);
+        }
+
+        Blazor.addEventListener('enhancedload', function () {
+            console.log('hide Loader');
+            loader.close();
+        });
+
+    </script> *@
+    @{
+        string val2 = File.ReadAllText(@$"{env.WebRootPath}\scripts\ScriptsF.txt");
+
+    }
+    @((MarkupString)val2)
+    <footer>
+        <div class="container w3-row">
+            <div class="w3-col s12 m6 footer-links">
+                <a href="/About">About</a>
+                <a href="/sitemap.xml">Sitemap</a>
+                <a href="/ElAI">ElAI</a>
+                <a href="/Trending">Trending</a>
+                <a href="/Latest">Latest</a>
+
+            </div>
+            <div class="w3-col s12 m6 copyright">elmovies.com © @DateTime.Now.ToString("yyyy") | All Rights Reserved</div>
+        </div>
+    </footer>
+</body>
+
+
+</html>
+
+
+
+

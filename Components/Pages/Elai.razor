@@ -1,0 +1,435 @@
+﻿@page "/Elai"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<PageTitle>@("Search Online Movies with ElAI | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <meta property="og:title" name="description" content="Download free movies online. You can download every type of movie in elmovies.com " />
+</HeadContent>
+
+<main class="homepage-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" style="width: 47px;" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+
+                    <form action="search" class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="/icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+
+
+    <!-- End: Header -->
+    <div class="sidebar-overlay overlay">
+        <div class="w3-sidebar">
+
+            <br><br><br>
+
+            <div class="collection">
+                <div class="collection-item"><a href="/trending.html">Trending</a></div>
+                <div class="collection-item"><a href="#">Latest</a></div>
+            </div>
+
+            <div class="w3-bar-item w3-button">
+                <div class="w3-col">
+                    <div class="w3-col s6"></div>
+                    <div class="w3-col s6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-2"></div>
+    @if (string.IsNullOrWhiteSpace(Title))
+    {
+
+        <h3>Loading Your Search....</h3>
+
+    }
+    else if(string.IsNullOrEmpty(qry))
+    {
+        <div class="container">
+
+            <div class="w3-row">
+                <div class="mb-2">&nbsp;</div>
+
+                <div class="mb-2">&nbsp;</div>
+                <div class="w3-col s12 text-center">
+                    <h3>Try <b>ElAi</b> to look up your Movies</h3>
+                </div>
+                <div class="w3-col s12">
+                    <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+
+
+
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <PageTitle>@(Title + " | elmovies.com")</PageTitle>
+    
+        <div class="container">
+
+            <div class="w3-row">
+                <div class="mb-2">&nbsp;</div>
+
+                <div class="w3-col s12 text-center">
+                    <h3>@error</h3>
+                </div>
+                <div class="mb-2">&nbsp;</div>
+      
+                <div class="w3-col s12">
+                    <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+
+
+
+            </div>
+        </div>
+    }
+    else
+    {
+     
+            <PageTitle>@(Title + " | elmovies.com")</PageTitle>
+         
+        <main class="homepage-main">
+            <div class="container">
+                <div class="container">
+
+                    <div class="w3-row">
+                        <div class="mb-2">&nbsp;</div>
+
+                        <div class="w3-col s12 text-center">
+                            <h3>Try ElAi</h3>
+                        </div>
+                        <div class="mb-2">&nbsp;</div>
+
+                        <div class="w3-col s12">
+                            <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                                <img src="icons/search.svg" alt="">
+                                <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                                <ul class="autocomplete-result-list"></ul>
+                                <button type="submit">Search</button>
+                            </form>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="mb-2">&nbsp;</div>
+
+                    <div class="row">
+                        
+                        <div class="w-100 text-center"><b>Results</b></div>
+                        @foreach(var link in Links)
+                        {
+                            <li class="card search-result my-2">
+                                <div class="info pl-md-0 pl-1">
+                                    <div class="mb-2"></div>
+
+                                    <h5 class="title w-100 truncate mb-1 "><a href="@link.link" data-token="">@link.name</a></h5>
+                                    <p>@link.from</p>
+                                    <div class="mb-2"></div>
+
+                                </div>
+
+                                <div class="links center-flex hide-on-small px-3">
+                                    <a href="@link.link" rel="noreferrer" target="_blank" class="dl-magnet"><img src="/icons/download-torrent.svg" alt="Torrent" title="Download .torrent file"></a>
+                                </div>
+                            </li>
+                        }
+                       
+                        
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    }
+
+
+    <div class="mb-2">&nbsp;</div>
+</main>
+<script src="_framework/blazor.web.js"></script>
+
+@code {
+    [Parameter]
+    public string qry { get; set; }
+
+    public string Title = "";
+    public string Slug = "";
+    public string error = "";
+
+
+    List<TblPost> sposts = new List<TblPost>();
+    public class Link()
+    {
+        public string name;
+        public string link;
+        public string from;
+    }
+    List<Link> Links = new List<Link>();
+
+    public List<TblPost> GetuniqueBank1(string bankname)
+    {
+        return Context.TblPosts.Where(x => x.Mcategory.Trim().ToLower().Contains(bankname.Trim().ToLower())).OrderByDescending(x => x.DateInserted).ToList();
+    }
+
+    private async Task Getpkspeed()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://www.watch-online-movies.com.pk/?s={qry.ToLower().Replace(" ", "+")}");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//h2/a[@rel='bookmark']");//this xpath selects all span tag having its class as hidden first
+
+        //Getpkspeeddonwloand(itemList.First().Attributes["href"].Value);
+        string cpy = "";
+        int i = 0;
+        try
+        {
+
+            foreach (var item in itemList.Take(2))
+            {
+
+                if (item.Attributes["href"].Value.Contains(Slug + "-") )
+                {
+                    if (item.Attributes["href"].Value.Contains("hindi"))
+                    {
+                        await Getpkspeeddonwloand(itemList.First().Attributes["href"].Value, "(HINDI)");
+                        //Body += Environment.NewLine+" HINDI " + item.Attributes["href"].Value;
+                    }
+                    else
+                    {
+                        await Getpkspeeddonwloand(itemList.First().Attributes["href"].Value, "(ENGLISH)");
+                        //Body += Environment.NewLine + " ENGLISH " + item.Attributes["href"].Value;
+                    }
+                    cpy = itemList.First().Attributes["href"].Value;
+                }
+                i++;
+            }
+            if (string.IsNullOrEmpty(cpy))
+            {
+                await Get1337x();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Get1337x();
+        }
+
+    }
+
+    private async Task Getpkspeeddonwloand(string url, string lang)
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync(url);
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@class='singcont']/p/a[@target='_blank']");//this xpath selects all span tag having its class as hidden first
+
+        if(itemList.Count >= 1)
+        {
+            foreach (var item in itemList)
+            {
+
+                if (!item.InnerText.Contains("360p"))
+                {
+                    Link lk = new Link();
+                    
+
+                    lk.name = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(url.Replace("https://www.watch-online-movies.com.pk/", "").Replace("-", " ").Replace(" full movie watch online hd print free download/", ""));
+                    lk.link = item.Attributes["href"].Value;
+                    lk.from = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace("Click To Download (Link 2 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p") + "-" + lang;
+                    Links.Add(lk);
+                }
+            }
+        }
+
+
+        await Get1337x();
+    }
+
+
+    private async Task GetYTS()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://yts.mx/browse-movies/{qry}/all/all/0/latest/0/all");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@class='browse-movie-wrap col-xs-10 col-sm-4 col-md-5 col-lg-4']/a[@class='browse-movie-link']");//this xpath selects all span tag having its class as hidden first
+
+
+        string cpy = "";
+        try
+        {
+            foreach (var item in itemList.Take(3))
+            {
+
+                if (item.Attributes["href"].Value.Contains(Slug))
+                {
+                    await GetYTSdonwloand(item.Attributes["href"].Value);
+                    cpy = item.Attributes["href"].Value;
+                }
+
+            }
+            if (string.IsNullOrEmpty(cpy))
+            {
+                await Getpkspeed();
+            }
+        }
+        catch
+        {
+            await Getpkspeed();
+        }
+
+    }
+    private async Task GetYTSdonwloand(string url)
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync(url);
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//p[@class='hidden-md hidden-lg']/a[@rel='nofollow']");//this xpath selects all span tag having its class as hidden first
+
+        foreach (var item in itemList)
+        {
+            Link lk = new Link();
+            lk.name =  System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(url.Replace("https://yts.mx/movies/", "").Replace("-", " "));
+
+            lk.link = item.Attributes["href"].Value;
+            lk.from = "YTS-" + ((item.InnerText.Contains("2160p")) ? "2160p" : (item.InnerText.Contains("1080p")) ? "1080p" : "720p");
+            Links.Add(lk);
+            ///s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(url.Replace("https://yts.mx/movies/", "").Replace("-", " "));
+        }
+        await Getpkspeed();
+    }
+    private async Task Get1337x()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://bitsearch.to/search?q={qry.ToLower().Replace(" ", "+")}");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//li[@class='card search-result my-2']");//this xpath selects all span tag having its class as hidden first
+
+        //Getpkspeeddonwloand(itemList.First().Attributes["href"].Value);
+
+        int i = 0;
+        string cpy = "";
+        try
+        {
+            if(itemList.Count > 1)
+            {
+                foreach (var item in itemList.Select((value, i) => new { i, value }).Take(5))
+                {
+                    Link lk = new Link();
+
+
+
+                    lk.link = item.value.SelectNodes("//div[@class='links center-flex hide-on-small px-3']/a[@class='dl-magnet']").ElementAt(item.i).Attributes["href"].Value.Replace("&amp;", "&").Replace("&#x3D;", "=").Replace("Bitsearch.to", "elmovies.com");
+                    lk.name = item.value.SelectNodes("//div[@class='info px-3 pt-2 pb-3']/div/h5/a").ElementAt(item.i).InnerText;
+                    lk.from = "Torrents-" + ( (lk.name.Contains("2160p")) ? "2160p" : (lk.name.Contains("1080p")) ? "1080p" : "720p");
+                    Links.Add(lk);
+
+
+                    i++;
+                }
+             
+                Title = qry;
+            }
+            else
+            {
+
+                error = "No Movie found, Please Enter Similar name of movie you are looking for1!";
+            }
+
+         
+        
+
+        }
+        catch (Exception ex)
+        {
+            Title = "Nothing Found!";
+            error = ex.Message;
+
+        }
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            SaveViews.Save("/Elai", HttpContextAccessor, Context);
+
+            var uri = MyNavigationManager.ToAbsoluteUri(MyNavigationManager.Uri);
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var _code))
+            {
+                qry = Convert.ToString(_code).Replace("+"," ");
+                await GetYTS();
+            }
+            else
+            {
+                Title = "ElAI Search Movies Online";
+            }
+            StateHasChanged();
+        }
+        
+    }
+}

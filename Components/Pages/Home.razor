@@ -1,0 +1,171 @@
+﻿@page "/"
+@using FOM.Models
+@using Microsoft.Data.SqlClient
+@using System.Data
+@using Microsoft.EntityFrameworkCore
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+<PageTitle>@("Download Free Movies Online | elmovies.com")</PageTitle>
+<HeadContent>
+    <meta name="google-site-verification" content="NjZAm86Ux6jVQe5YtHmgJVQzsJUNqkNGSDyqGMG-NEI" />
+    <link rel='stylesheet' href='../../../assets/css/search.css?ver=1.2' />
+    <meta property="og:title" name="description" content="elmovies.com is the #1 site for download free online movies. You can download any movie with a single click." />
+</HeadContent>
+<header>
+    <div class="container w3-row">
+        <div class="w3-col s6 header-links hide-on-small">
+            @* <a href="ElAI" class="login-button">ElAI</a> *@
+            <a href="Trending" class="login-button">Trending</a>
+            <a href="Latest" class="login-button">Latest</a>
+            <a href="Categorys" class="login-button">Categorys</a>
+            <a href="Tags" class="login-button">Tags</a>
+        </div>
+
+        <div class="w3-col s12 header-links w3-right-align show-on-small">
+            <a href="#" class="sidebar-trigger"><img src="icons/menu.svg" alt="Menu"></a>
+        </div>
+    </div>
+</header>
+<div class="sidebar-overlay overlay">
+    <div class="w3-sidebar">
+
+        <br><br><br>
+
+        <div class="collection">
+            <div class="collection-item"><a href="/Trending">Trending</a></div>
+            <div class="collection-item"><a href="/Latest">Latest</a></div>
+            @* <div class="collection-item"><a href="/ElAI">ElAI</a></div> *@
+
+        </div>
+
+        <div class="w3-bar-item w3-button">
+            <div class="w3-col">
+                <div class="w3-col s6"></div>
+                <div class="w3-col s6"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<main class="homepage-main">
+    <div class="container">
+     
+        <div class="w3-row">
+            <div class="mb-2">&nbsp;</div>
+
+			<div class="w3-col s12 text-center">
+                <p style="color:#b40f1d; font-weight:900; font-size:60px">EL <b style="color:white"> Movies</b></p>
+			</div>
+            <div class="w3-col s12">
+                <form action="search" class="search-bar">
+                    <input type="search" name="q" pattern=".*\S.*" required>
+                    <button class="search-btn" type="submit">
+                        <span>Search</span>
+                    </button>
+                </form>
+
+            </div>
+
+            <div class="w3-col s12 py-3">
+                <div class="w-100 text-center"><b>Popular Categories</b></div>
+               
+                <div class="r wrap mx-auto homepage-categories">
+
+                    <a href="Category/Action" class="cat-container">
+                        <div class="w3-bar">
+                            <div class="w3-bar-item hp-cat-img-container">
+                                <img src="categoryicon/cat-action.svg"
+                                     alt="Movies" />
+                            </div>
+                            <div class="w3-bar-item center">Action</div>
+                        </div>
+                    </a>
+                    <a href="Category/Comedy" class="cat-container">
+                        <div class="w3-bar">
+                            <div class="w3-bar-item hp-cat-img-container">
+                                <img src="categoryicon/cat-comedy.svg"
+                                     alt="cat-comedy" />
+                            </div>
+                            <div class="w3-bar-item center">Comedy</div>
+                        </div>
+                    </a>
+                    <a href="Category/Sci-fi" class="cat-container">
+                        <div class="w3-bar">
+                            <div class="w3-bar-item hp-cat-img-container">
+                                <img src="categoryicon/cat-scifi.svg"
+                                     alt="cat-scifi" />
+                            </div>
+                            <div class="w3-bar-item center">Sci-fi</div>
+                        </div>
+
+                    </a>
+                    <a href="Category/Horror" class="cat-container">
+                        <div class="w3-bar">
+                            <div class="w3-bar-item hp-cat-img-container">
+                                <img src="categoryicon/cat-horror.svg"
+                                     alt="cat-horror" />
+                            </div>
+                            <div class="w3-bar-item center">Horror</div>
+                        </div>
+                    </a>
+                    <a href="Category/Animation" class="cat-container">
+                        <div class="w3-bar">
+                            <div class="w3-bar-item hp-cat-img-container">
+                                <img src="categoryicon/cat-animated.svg"
+                                     alt="cat-animated" />
+                            </div>
+                            <div class="w3-bar-item center">Animation</div>
+                        </div>
+                    </a>
+                    <a href="/Series" class="cat-container">
+                        <div class="w3-bar">
+                            <div class="w3-bar-item hp-cat-img-container">
+                                <img src="categoryicon/cat-series.svg"
+                                     alt="cat-series" />
+                            </div>
+                            <div class="w3-bar-item center">Series</div>
+                        </div>
+                        
+                    </a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</main>
+<script src="../../../scripts/script.js"></script>
+
+@code {
+
+
+    protected override async void OnInitialized()
+    {
+
+        SaveViews.Save("/Home",HttpContextAccessor,Context);
+
+    }
+    private DeviceInfo Deviceinfo { get; set; } = new DeviceInfo();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
+    }
+
+    public class DeviceInfo
+    {
+        public string Device { get; set; }
+        public string Browser { get; set; }
+    }
+
+}
+
+

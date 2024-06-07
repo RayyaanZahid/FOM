@@ -1,0 +1,247 @@
+﻿@page "/sitemap.azeznstudio"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@using System.Data
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<PageTitle>@("Sitemap.xml | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <meta property="og:title" name="description" content="Sitemap.xml for Download free movies online. You can download every type of movie in elmovies.com " />
+</HeadContent>
+
+<main class="homepage-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+                    <form action="search" class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search Your Desired Item here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+    <!-- End: Header -->
+    <div class="sidebar-overlay overlay">
+        <div class="w3-sidebar">
+
+            <br><br><br>
+
+            <div class="collection">
+                <div class="collection-item"><a href="trending">Trending</a></div>
+                <div class="collection-item"><a href="latest">Latest</a></div>
+            </div>
+
+            <div class="w3-bar-item w3-button">
+                <div class="w3-col">
+                    <div class="w3-col s6"></div>
+                    <div class="w3-col s6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="view-box">
+            <h1>AzeznStudio</h1>
+            <p>This web site was created by AzeznStudio.com</p>
+
+            <p>
+                <b>Basic Pages</b>
+            </p>
+            <p><a href="@(MyNavigationManager.BaseUri+"/")">Home</a></p>
+            <p>
+                <a href="@(MyNavigationManager.BaseUri+"About")">About</a>
+            </p>
+            <p><a href="@(MyNavigationManager.BaseUri+"Trending")">Trending</a></p>
+            <p>
+                <a href="@(MyNavigationManager.BaseUri+"Latest")">Latest</a>
+            </p>
+            <p>
+                <a href="@(MyNavigationManager.BaseUri+"Search")">Search</a>
+            </p>
+            <p><a href="@(MyNavigationManager.BaseUri+"Categorys")">Categorys</a></p>
+            <p><a href="@(MyNavigationManager.BaseUri+"Tags")">Tags</a></p>
+ 
+            
+            
+            @if (cate.Count == 0)
+            {
+                <p>
+                    <b>Categorys</b>
+                </p>
+                <p><a href="">Not Found</a></p>
+            }
+			else
+			{
+                <p>
+                    <b>Categorys</b>
+                </p>
+                @foreach (var post in cate)
+                {
+                    <p><a href="@(MyNavigationManager.BaseUri+"Category/"+post.name)">@(MyNavigationManager.BaseUri + "Category/" + post.name)</a></p>
+                }
+            }
+            @if (tags.Count == 0)
+            {
+                <p>
+                    <b>Tags</b>
+                </p>
+                <p><a href="">Not Found</a></p>
+            }
+            else
+            {
+                <p>
+                    <b>Tags</b>
+                </p>
+                @foreach (var post in tags)
+                {
+                    <p><a href="@(MyNavigationManager.BaseUri+"Tag/"+post.name)">@(MyNavigationManager.BaseUri + "Tag/" + post.name)</a></p>
+                }
+            }
+            @if (posts.Count == 0)
+            {
+                <p>
+                    <b>Posts</b>
+                </p>
+                <p><a href="">Not Found</a></p>
+            }
+            else
+            {
+                <p>
+                    <b>Posts</b>
+                </p>
+                @foreach (var post in posts)
+                {
+                    <p><a href="@(MyNavigationManager.BaseUri+""+post.name)">@(MyNavigationManager.BaseUri + "" + post.name)</a></p>
+                }
+            }
+        </div>
+    </div>
+  
+
+    <div class="mb-2">&nbsp;</div>
+</main>
+
+
+
+
+@code {
+    [Parameter]
+    public string? Slug { get; set; }
+    public int totalpage { get; set; }
+    public int pageindex { get; set; }
+    public int pagesize { get; set; }
+    public string qry { get; set; }
+
+    public class categorys
+    {
+        public String name;
+    }
+    List<categorys> cate = new List<categorys>();
+
+    public class tag
+    {
+        public String name;
+    }
+    List<tag> tags = new List<tag>();
+
+    public class post
+    {
+        public String name;
+    }
+    List<post> posts = new List<post>();
+
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    private void OnChange(ChangeEventArgs e)
+    {
+        ValueChanged.InvokeAsync(e.Value.ToString());
+    }
+
+    private void GetuniqueBank()
+    {
+        DataSet ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select * from vwcategorys", conn);
+        cmd.Fill(ds);
+        conn.Close();
+
+        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+        {
+            categorys tg = new categorys();
+            tg.name = ds.Tables[0].Rows[i]["Tags"].ToString();
+            cate.Add(tg);
+        }
+    }
+    private void GetuniqueBank1()
+    {
+        DataSet ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select * from vwtags", conn);
+        cmd.Fill(ds);
+        conn.Close();
+
+        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+        {
+            tag tg = new tag();
+            tg.name = ds.Tables[0].Rows[i]["Tags"].ToString();
+            tags.Add(tg);
+        }
+    }
+    private void GetuniqueBank2()
+    {
+        DataSet ds = new DataSet();
+        SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+        conn.Open();
+        SqlDataAdapter cmd = new SqlDataAdapter($"Select * from tblposts", conn);
+        cmd.Fill(ds);
+        conn.Close();
+
+        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+        {
+            post tg = new post();
+            tg.name = ds.Tables[0].Rows[i]["Slug"].ToString();
+            posts.Add(tg);
+        }
+    }
+    public List<TblPost> Getuniquename(string bankname)
+    {
+        return Context.TblPosts.Where(x => x.Title.Contains(bankname)).ToList();
+    }
+ 
+
+    private void searchpost()
+    {
+
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetuniqueBank();
+        GetuniqueBank1();
+        GetuniqueBank2();
+    }
+}

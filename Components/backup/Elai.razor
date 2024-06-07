@@ -1,0 +1,762 @@
+﻿@page "/Elai.azeznstudio"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc
+@inject NavigationManager MyNavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@using Models
+@inject MyDbContext Context
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<PageTitle>@("Search Online Movies with ElAI | elmovies.com")</PageTitle>
+<HeadContent>
+
+    <meta property="og:title" name="description" content="Download free movies online. You can download every type of movie in elmovies.com " />
+</HeadContent>
+
+<main class="homepage-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container py-2 d-flex flex-row flex-nowrap">
+            <a class="navbar-brand" href="#">
+                <a href="/">
+                    <img class="logo-1 show-on-large" style="width: 198px;" src="../../../assets/s.png" alt="Logo" />
+                    <img class="logo-1 hide-on-large" src="../../../assets/foms.png" alt="Logo" />
+                </a>
+            </a>
+            <div class="navbar-nav flex-grow-1 w-100 justify-content-end">
+                <div class="px-3">
+
+                    <form action="search" class="search-form autocomplete " id="autocomplete" style="max-height: 200px;">
+                        <img src="/icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text"
+                               placeholder="Search here..." value="">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header>
+    </header>
+
+
+    <!-- End: Header -->
+    <div class="sidebar-overlay overlay">
+        <div class="w3-sidebar">
+
+            <br><br><br>
+
+            <div class="collection">
+                <div class="collection-item"><a href="/trending.html">Trending</a></div>
+                <div class="collection-item"><a href="#">Latest</a></div>
+            </div>
+
+            <div class="w3-bar-item w3-button">
+                <div class="w3-col">
+                    <div class="w3-col s6"></div>
+                    <div class="w3-col s6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-2"></div>
+    @if (string.IsNullOrWhiteSpace(Title))
+    {
+
+        <h3>Loading Your Search....</h3>
+
+    }
+    else if(string.IsNullOrEmpty(qry))
+    {
+        <div class="container">
+
+            <div class="w3-row">
+                <div class="mb-2">&nbsp;</div>
+
+                <div class="mb-2">&nbsp;</div>
+                <div class="w3-col s12 text-center">
+                    <h3>Try <b>ElAi</b> to look up your Movies</h3>
+                </div>
+                <div class="w3-col s12">
+                    <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+
+
+
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <PageTitle>@(Title + " | elmovies.com")</PageTitle>
+    
+        <div class="container">
+
+            <div class="w3-row">
+                <div class="mb-2">&nbsp;</div>
+
+                <div class="w3-col s12 text-center">
+                    <h3>@error</h3>
+                </div>
+                <div class="mb-2">&nbsp;</div>
+      
+                <div class="w3-col s12">
+                    <form action="elai" class="search-form mx-auto autocomplete" id="autocomplete">
+                        <img src="icons/search.svg" alt="">
+                        <input name="q" class="autocomplete-input" type="text" placeholder="Search anything here...">
+                        <ul class="autocomplete-result-list"></ul>
+                        <button type="submit">Search</button>
+                    </form>
+
+                </div>
+
+
+
+            </div>
+        </div>
+    }
+    else
+    {
+     
+            <PageTitle>@(Title + " | elmovies.com")</PageTitle>
+            <HeadContent>
+
+                <meta property="og:title" name="description" content="@Meta in elmovies.com" />
+            </HeadContent>
+            <div class="container hide" id="alart-box">
+                <div class="view-box">
+                    <span id="alart-message">message</span>
+                </div>
+            </div>
+
+            <div class="container" id="alart-box">
+                <div class="container details-page-layout">
+                    <div class="details-box view-box">
+                        <div class="thumb">
+                            <div class="poster-image br-5" style="background-image: url('@Image')" alt="poster"></div>
+                        </div>
+                        <div class="details">
+                            <h1 class="mt-0 title">@Title</h1>
+                            <div class="info-panel primary-text inline-children">
+                                <a href="/Category/@MCategory" class="link-1 primary-bg">@MCategory.Trim()</a>
+                                @* <a class="link-1 primary-bg y8truigr" @onclick="savelikes"><img src="/icons/like.svg" alt="Likes" style="transform: translateY(-2px)"> Likes</a> *@
+                                @* <a class="link-1 primary-bg y8truigr" @onclick="savedislike"><img src="/icons/dislike.svg" alt="Dislikes">  Dislikes</a> *@
+                            </div>
+
+                             <table class="stat-table">
+                                <tr>
+                                    <td><img src="/icons/size.svg" alt="" style="transform: translateY(-2px)"> Run Time</td>
+                                    <td>@Size</td>
+                                </tr>
+                           @*      <tr>
+                                    <td><img src="/icons/download.svg" alt="" style="transform: translateY(-2px)"> Downloads</td>
+                                    <td>0</td>
+                                </tr> *@
+                                <tr>
+                                    <td><img src="/icons/calendar.svg" alt="" style="transform: translateY(-2px)"> Uploaded</td>
+                                    <td>@DateTime.Now.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            </table> 
+                        </div>
+                        <div class="dl-links">
+                            @if (!string.IsNullOrWhiteSpace(Tlink1))
+                            {
+                                <a  href="@Link1" target="_blank">
+                                <div class="p-1 br-5 center-on-small dl-torrent"><img src="/icons/download-torrent.svg" alt="Download"> <b>@Tlink1.Replace("Click Here To Download (Link ", "")</b></div>
+                                </a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Tlink2))
+                            {
+                                <a  href="@Link2" target="_blank">
+                                    <div class="p-1 br-5 center-on-small dl-torrent"><img src="/icons/download-torrent.svg" alt="Download"> <b>@Tlink2.Replace("Click Here To Download (Link ", "")</b></div>
+                                </a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Tlink3))
+                            {
+                                <a  href="@Link3" target="_blank">
+                                <div class="p-1 br-5 center-on-small dl-torrent"><img src="/icons/download-torrent.svg" alt="Download"> <b>@Tlink3.Replace("Click Here To Download (Link ", "")</b></div>
+                                </a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Tlink4))
+                            {
+                                <a  href="@Link4" target="_blank">
+                                    <div class="p-1 br-5 center-on-small dl-torrent"><img src="/icons/download-torrent.svg" alt="Download"> <b>@Tlink4.Replace(" DOWNLOAD", "")</b></div>
+                                </a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Tlink5))
+                            {
+                                <a  href="@Link5" target="_blank">
+                                    <div class="p-1 br-5 center-on-small dl-magnet"><img src="/icons/download-magnet.svg" alt="Magnet"> <b>@Tlink5.Replace(" TORRENT", "")</b></div>
+                                </a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Tlink6))
+                            {
+                                <a  href="@Link6" target="_blank">
+                                    <div class="p-1 br-5 center-on-small dl-magnet"><img src="/icons/download-magnet.svg" alt="Magnet"> <b>@Tlink6.Replace(" TORRENT", "")</b></div>
+                                </a>
+
+                            }
+                        </div>
+                    </div>
+                    <div class="meta-box">
+
+
+                        <div class="w3-tabs">
+                            <div class="w3-bar">
+
+                                <div data-tab-target="tab3" class="w3-bar-item bold pl-0">More Info</div>
+                            </div>
+
+                            <div data-tab="tab3" class="tab view-box show files primary-text">
+                                <ul>
+                                    <li><b>Title:</b>@Title</li>
+                                    <li><b>Slug:</b> @Slug</li>
+                                    <li><b>Uploaded:</b>@DateTime.Now.ToString("MMM dd, yyyy")</li>
+                                    @* <li><b>Downloads:</b> Views</li> *@
+                                    <li><b>File Category:</b> @Category</li>
+                                    <li><b>Tags:</b> @Tags</li>
+                                    @* <li><b>Links:</b><a href=Link1 target="_blank">Tlink1.Replace("DOWNLOAD", "") </a><a @onclick="savedviews" href=Link5 target="_blank">Tlink5.Replace("TORRENT", "")  </a></li> *@
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="view-box r c" style="gap: 15px">
+
+                            <p> @((MarkupString)@Body)</p>
+                        </div>
+
+                    </div>
+                    <ul class="details-page-sidebar list">
+
+                        <div class="w3-bar">
+                            <div class="w3-bar-item bold pl-0 truncate">Similar Movies</div>
+                        </div>
+                        @foreach (var spost in sposts)
+                        {
+                            <li class="view-box">
+                                <div class="search-result">
+                                    <div class="info">
+                                    <h6 class="title w-100"><a href="@spost.Slug">@spost.Title</a></h6>
+                                        <div>
+                                        <a href="/Category/@spost.Mcategory" class="link-1 primary-bg">@spost.Mcategory.Trim()</a>
+                                            <div class="stats">
+                                            <div><img src="/icons/like.svg" alt="" style="transform: translateY(-1px); margin-right: 2px;"> <font color="#0AB49A">@spost.Likes</font></div>
+                                            <div><img src="/icons/dislike.svg" alt="" style="transform: translateY(-1px); margin-right: 2px;"> <font color="#C35257">@spost.Dislikes</font></div>
+                                            <div><img src="/icons/size.svg" alt="" style="transform: translateY(-1px); margin-right: 2px;">@spost.Size</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <div class="mb-2"></div>
+                        } 
+
+                    </ul>
+                </div>
+
+
+            </div>
+
+
+        
+
+    }
+
+
+    <div class="mb-2">&nbsp;</div>
+</main>
+
+
+
+@code {
+    [Parameter]
+    public string qry { get; set; }
+
+    public string Title = "";
+    public string Slug = "";
+
+    List<TblPost> sposts = new List<TblPost>();
+    public string Category="";
+    public string MCategory = "";
+    public string Tags = "";
+    public string Size = "";
+    public string Year = "";
+    public string Image = "";
+    public string Meta = "";
+    public string Body = "";
+    public string error="";
+
+    public string Tlink1 = "";
+    public string Tlink2 = "";
+    public string Tlink3 = "";
+    public string Tlink4 = "";
+    public string Tlink5 = "";
+    public string Tlink6 = "";
+    public string Link1 = "";
+    public string Link2 = "";
+    public string Link3 = "";
+    public string Link4 = "";
+    public string Link5 = "";
+    public string Link6 = "";
+
+    public List<TblPost> GetuniqueBank1(string bankname)
+    {
+        return Context.TblPosts.Where(x => x.Mcategory.Trim().ToLower().Contains(bankname.Trim().ToLower())).OrderByDescending(x => x.DateInserted).ToList();
+    }
+    private async Task GetRotten()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://www.rottentomatoes.com/search?search={qry}");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//search-page-media-row/a[@slot='title']");//this xpath selects all span tag having its class as hidden first
+
+        int i = 0;
+        string cpy = "";
+        try
+        {
+            //txtBody.Text = itemList.First().Attributes["href"].Value;
+            await GetRottenInfoURL(itemList.First().Attributes["href"].Value);
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+    private async Task Getpkspeed()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://www.watch-online-movies.com.pk/?s={qry.ToLower().Replace(" ", "+")}");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//h2/a[@rel='bookmark']");//this xpath selects all span tag having its class as hidden first
+
+        //Getpkspeeddonwloand(itemList.First().Attributes["href"].Value);
+        string cpy = "";
+        int i = 0;
+        try
+        {
+
+            foreach (var item in itemList)
+            {
+
+                if (item.Attributes["href"].Value.Contains(Slug + "-") && i <= 1)
+                {
+                    if (item.Attributes["href"].Value.Contains("hindi"))
+                    {
+                        await Getpkspeeddonwloand(itemList.First().Attributes["href"].Value, "(HINDI)");
+                        //Body += Environment.NewLine+" HINDI " + item.Attributes["href"].Value;
+                    }
+                    else
+                    {
+                        await Getpkspeeddonwloand(itemList.First().Attributes["href"].Value, "(ENGLISH)");
+                        //Body += Environment.NewLine + " ENGLISH " + item.Attributes["href"].Value;
+                    }
+                    cpy = itemList.First().Attributes["href"].Value;
+                }
+                i++;
+            }
+            if (string.IsNullOrEmpty(cpy))
+            {
+                await Get1337x();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Get1337x();
+        }
+
+    }
+
+    private async Task Getpkspeeddonwloand(string url, string lang)
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync(url);
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@class='singcont']/p/a[@target='_blank']");//this xpath selects all span tag having its class as hidden first
+
+
+        string cpy = "";
+        int i = 0;
+        if(itemList.Count >= 1)
+        {
+            foreach (var item in itemList)
+            {
+
+                if (!item.InnerText.Contains("360p") && !(item.Attributes["href"].Value == cpy))
+                {
+                    if (i == 0)
+                    {
+                        if (string.IsNullOrEmpty(Link1))
+                        {
+                            Tlink1 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p") + "-" + lang;
+                            Link1 = item.Attributes["href"].Value;
+                        }
+                        else
+                        {
+                            Tlink3 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p") + "-" + lang;
+                            Link3 = item.Attributes["href"].Value;
+                        }
+
+                    }
+                    else if (i == 1)
+                    {
+                        if (string.IsNullOrEmpty(Link2))
+                        {
+                            Tlink2 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p") + "-" + lang;
+                            Link2 = item.Attributes["href"].Value;
+                        }
+                        else
+                        {
+                            //Tlink4 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p") + "-" + lang;
+                            //Link4 = item.Attributes["href"].Value;
+                        }
+                    }
+
+                    cpy = item.Attributes["href"].Value;
+                    //Body += item.Attributes["href"].Value + Environment.NewLine;
+
+                    i++;
+                }
+            }
+        }
+
+
+        await Get1337x();
+    }
+    private async Task GetpkspeeddonwloandURL(string url)
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync(url);
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@class='singcont']/p/a[@target='_blank']");//this xpath selects all span tag having its class as hidden first
+
+
+        string cpy = "";
+        int i = 0;
+        foreach (var item in itemList)
+        {
+
+            if (!item.InnerText.Contains("360p") && !(item.Attributes["href"].Value == cpy))
+            {
+                if (i == 0)
+                {
+                    if (string.IsNullOrEmpty(Link1))
+                    {
+                        Tlink1 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p");
+                        Link1 = item.Attributes["href"].Value;
+                    }
+                    else
+                    {
+                        Tlink3 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p");
+                        Link3 = item.Attributes["href"].Value;
+                    }
+
+                }
+                else if (i == 1)
+                {
+                    if (string.IsNullOrEmpty(Link2))
+                    {
+                        Tlink2 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p");
+                        Link2 = item.Attributes["href"].Value;
+                    }
+                    else
+                    {
+                        //Tlink4 = item.InnerText.Replace("Click To Download (Link 1 ", "").Replace(" 720p)", "-720p").Replace(")", "-720p") + "-" + lang;
+                        //Link4 = item.Attributes["href"].Value;
+                    }
+                }
+
+                cpy = item.Attributes["href"].Value;
+                //Body += item.Attributes["href"].Value + Environment.NewLine;
+
+                i++;
+            }
+        }
+    }
+
+    private async Task GetYTS()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://yts.mx/browse-movies/{qry}/all/all/0/latest/0/all");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@class='browse-movie-wrap col-xs-10 col-sm-4 col-md-5 col-lg-4']/a[@class='browse-movie-link']");//this xpath selects all span tag having its class as hidden first
+
+        Link1 = "";
+        Link2 = "";
+        Link3 = "";
+        Link4 = "";
+        Tlink3 = "";
+        Tlink4 = "";
+        Tlink1 = "";
+        Tlink2 = "";
+        Link5 = "";
+        Tlink5 = "";
+        Link6 = "";
+        Tlink6 = "";
+        int i = 0;
+        string cpy = "";
+        try
+        {
+            foreach (var item in itemList)
+            {
+
+                if (item.Attributes["href"].Value.Contains(Slug) && i <= 1)
+                {
+                    await GetYTSdonwloand(item.Attributes["href"].Value);
+                    cpy = item.Attributes["href"].Value;
+                }
+                i++;
+            }
+            if (string.IsNullOrEmpty(cpy))
+            {
+                await Getpkspeed();
+            }
+        }
+        catch
+        {
+            await Getpkspeed();
+        }
+
+    }
+    private async Task GetYTSdonwloand(string url)
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync(url);
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//p[@class='hidden-md hidden-lg']/a[@rel='nofollow']");//this xpath selects all span tag having its class as hidden first
+
+        string cpy = "";
+        int i = 0;
+        foreach (var item in itemList)
+        {
+
+
+            if (i == 0)
+            {
+
+                Tlink3 = "YTS-" + item.InnerText.Replace(".WEB", "");
+                Link3 = item.Attributes["href"].Value;
+
+
+            }
+            else if (i == 1)
+            {
+
+
+                Tlink4 = "YTS-" + item.InnerText.Replace(".WEB", "");
+                Link4 = item.Attributes["href"].Value;
+
+            }
+
+            cpy = item.Attributes["href"].Value;
+            //Body += item.Attributes["href"].Value + Environment.NewLine;
+
+            i++;
+
+        }
+        await Getpkspeed();
+    }
+    private async Task Get1337x()
+    {
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync($"https://bitsearch.to/search?q={qry.ToLower().Replace(" ", "+")}");
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@class='links center-flex hide-on-small px-3']/a[@class='dl-magnet']");//this xpath selects all span tag having its class as hidden first
+
+        //Getpkspeeddonwloand(itemList.First().Attributes["href"].Value);
+
+        int i = 0;
+        string cpy = "";
+        try
+        {
+            if(itemList.Count > 1)
+            {
+                foreach (var item in itemList)
+                {
+
+                    if (i == 0)
+                    {
+                        if (item.Attributes["href"].Value.Contains("1080p"))
+                        {
+                            Tlink5 = "Magnet-1080p";
+                        }
+                        else
+                        {
+                            Tlink5 = "Magnet-720p";
+                        }
+
+                        Link5 = item.Attributes["href"].Value.Replace("amp;", "").Replace("&#x3D;", "=").Replace("Bitsearch.to", "elmovies.com");
+                    }
+                    else
+                    {
+                        if (item.Attributes["href"].Value.Contains("1080p"))
+                        {
+                            Tlink6 = "Magnet-1080p";
+                        }
+                        else
+                        {
+                            Tlink6 = "Magnet-720p";
+                        }
+
+                        Link6 = item.Attributes["href"].Value.Replace("amp;", "").Replace("&#x3D;", "=").Replace("Bitsearch.to", "elmovies.com");
+                    }
+
+                    i++;
+                }
+                await GetRotten();
+            }
+            else
+            {
+
+                error = "No Movie found, Please Enter Similar name of movie you are looking for1!";
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            Title = "Nothing Found!";
+            error = "No Movie found Please Enter Similar name of movie you are looking for!";
+
+        }
+
+
+    }
+    private async Task GetRottenInfoURL(string url)
+    {
+
+
+
+        HttpClient client = new HttpClient();
+        string page = await client.GetStringAsync(url);
+        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        doc.LoadHtml(page);
+
+        var itemList = doc.DocumentNode.SelectNodes("//div[@id='main']");//this xpath selects all span tag having its class as hidden first
+
+        foreach (var item in itemList)
+        {
+            Title = qry;
+            Slug = Title.ToLower().Replace(" ","-");
+            Image = item.SelectNodes("//div[@class='movie-thumbnail-wrap']/tile-dynamic/rt-img[@slot='image']").First().Attributes["src"].Value;
+
+            Meta = " " + item.SelectNodes("//div[@class='media-body']/div[@class='panel-body content_body']/drawer-more/p").First().InnerText.Replace("  ", "");
+            Body = Environment.NewLine + Meta + Environment.NewLine + item.SelectNodes("//div[@class='media-body']/div/ul").First().OuterHtml.Replace("/celebrity/", "https://www.rottentomatoes.com/celebrity/");
+
+            Category = item.SelectNodes("//div[@class='media-body']/div[@class='panel-body content_body']/ul/li/p/span[@class='genre']").First().InnerText.Replace(" ", "").Replace("&amp;", "&").Replace(",", ", ");
+            Year = Convert.ToDateTime(item.SelectNodes("//div[@class='media-body']/div[@class='panel-body content_body']/ul/li/p/span/time").First().InnerText).ToString("yyyy");
+            string[] titlesplit = qry.Split(' ');
+            Tags = Category;
+
+
+
+            foreach (var tag in titlesplit) { Tags += ", " + tag; }
+
+            Size = (item.SelectNodes("//div[@class='media-body']/div[@class='panel-body content_body']/ul/li/p/span/time").Where(x => x.InnerHtml.Contains("h ")).ToArray()).First().InnerText.ToString().Replace(" ", "").Replace("h", "h ");
+            sposts = GetuniqueBank1(MCategory);
+
+            if (Category.Contains("Animation"))
+                MCategory = "Animation";
+
+            else if (Category.Contains("Comedy"))
+                MCategory = "Comedy";
+
+            else if (Category.Contains("Sci fi"))
+                MCategory = "Sci-fi";
+
+            else if (Category.Contains("Horror"))
+                MCategory = "Horror";
+
+            else if (Category.Contains("Action"))
+                MCategory = "Action";
+
+            else
+                MCategory = "Unknown";
+        }
+
+        if (!string.IsNullOrEmpty(Meta) || !string.IsNullOrEmpty(Category))
+        {
+            SqlConnection conn = new SqlConnection(Context.Database.GetConnectionString().ToString());
+            conn.Open();
+            SqlCommand cmd = new SqlCommand($"Insert into tblElai(slug) Values('{qry}')", conn);
+            cmd.ExecuteNonQuery();
+            conn.Close();
+
+        }
+    }
+    List<TblPost> posts = new List<TblPost>();
+
+    public List<TblPost> GetuniqueBank()
+    {
+        return Context.TblPosts.Where(x => x.Title.ToLower().Trim().Contains(qry.ToLower().Trim())).ToList();
+    }
+    private async Task chklocal()
+    {
+        posts = GetuniqueBank();
+        if(posts.Count > 0)
+        {
+            MyNavigationManager.NavigateTo("/search?q=" + qry);
+        }
+        else
+        {
+            await GetYTS();
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var uri = MyNavigationManager.ToAbsoluteUri(MyNavigationManager.Uri);
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var _code))
+            {
+                qry = Convert.ToString(_code).Replace("+"," ");
+                await chklocal();
+            }
+            else
+            {
+                Title = "ElAI Search Movies Online";
+            }
+            StateHasChanged();
+        }
+        
+    }
+}
