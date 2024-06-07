@@ -13,7 +13,7 @@ namespace FOM
     {
         string hostname = "https://elmovies.com/";
         public static string xml;
-        SqlConnection conn = new SqlConnection("Data Source=66.165.248.146\\MSSQLSERVER2022;Initial Catalog=OEXAM;User ID=azeznexam;Password=hasray786...;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+        SqlConnection conn = new SqlConnection("Data Source=localhost;Initial Catalog=fom;User ID=sa;Password=1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
         public  class post
         {
             public String name;
@@ -53,7 +53,7 @@ namespace FOM
             SqlCommand cmdchk = new SqlCommand("Select Count(*) from vwseries", conn);
             int tot = (int)cmdchk.ExecuteScalar();
             int tbl = (int)(tot / 20);
-            SqlDataAdapter cmd = new SqlDataAdapter($"Select * from Oexam.azeznexam.vwSeries ORDER BY dateinserted OFFSET  {tbl * index} ROWS FETCH NEXT {tbl} ROWS ONLY", conn);
+            SqlDataAdapter cmd = new SqlDataAdapter($"Select * from vwSeries ORDER BY dateinserted OFFSET  {tbl * index} ROWS FETCH NEXT {tbl} ROWS ONLY", conn);
             cmd.Fill(ds);
             conn.Close();
 
