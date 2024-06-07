@@ -13,7 +13,7 @@ namespace FOM
     {
         string hostname = "https://elmovies.com/";
         public static string xml;
-        SqlConnection conn = new SqlConnection("Data Source=66.165.248.146\\MSSQLSERVER2022;Initial Catalog=OEXAM;User ID=azeznexam;Password=hasray786...;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+        SqlConnection conn = new SqlConnection("Data Source=localhost;Initial Catalog=OEXAM;User ID=sa;Password=1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
         public  class post
         {
             public String name;
